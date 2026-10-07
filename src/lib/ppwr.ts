@@ -166,9 +166,9 @@ const ESITI = ["", "SI", "NO", "NA"];
 export function validateImport(raw: unknown): { ok: true; evaluation: Evaluation } | { ok: false; error: string } {
   if (!raw || typeof raw !== "object") return { ok: false, error: "Il file non contiene un oggetto JSON valido." };
   const r = raw as Record<string, unknown>;
-  if (r.app !== APP_SIGNATURE) return { ok: false, error: "Firma applicazione mancante o errata: il file non è stato generato da questo programma." };
-  if (typeof r.schemaVersion !== "number" || r.schemaVersion > SCHEMA_VERSION) return { ok: false, error: "Versione dello schema non supportata." };
-  const e = r.evaluation as Record<string, unknown> | undefined;
+  if (r["app"] !== APP_SIGNATURE) return { ok: false, error: "Firma applicazione mancante o errata: il file non è stato generato da questo programma." };
+  if (typeof r["schemaVersion"] !== "number" || r["schemaVersion"] > SCHEMA_VERSION) return { ok: false, error: "Versione dello schema non supportata." };
+  const e = r["evaluation"] as Partial<Evaluation> & Record<string, unknown> | undefined;
   if (!e || typeof e !== "object") return { ok: false, error: "Sezione 'evaluation' assente." };
   if (!isStr(e.title) || !e.imballo || typeof e.imballo !== "object") return { ok: false, error: "Titolo o dati imballo non validi." };
   for (const [key, items] of [["art11", ART11], ["all6b", ALL6B]] as const) {
