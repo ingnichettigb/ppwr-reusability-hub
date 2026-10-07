@@ -46,7 +46,7 @@ async function downloadPdf(ev: Evaluation) {
       margin: 0, filename: buildFileName(ev.title, "pdf"),
       image: { type: "jpeg", quality: 0.96 }, html2canvas: { scale: 2, useCORS: true },
       jsPDF: { unit: "mm", format: "a4", orientation: "portrait" }, pagebreak: { mode: ["css", "legacy"] },
-    } as Parameters<ReturnType<typeof html2pdf>["set"]>[0]).from(el).save();
+    } as any).from(el).save();
   } finally { el.classList.remove("pdf-mode"); }
 }
 
