@@ -46,7 +46,7 @@ async function downloadPdf(ev: Evaluation) {
       margin: 0, filename: buildFileName(ev.title, "pdf"),
       image: { type: "jpeg", quality: 0.96 }, html2canvas: { scale: 2, useCORS: true },
       jsPDF: { unit: "mm", format: "a4", orientation: "portrait" }, pagebreak: { mode: ["css", "legacy"] },
-    }).from(el).save();
+    } as Parameters<ReturnType<typeof html2pdf>["set"]>[0]).from(el).save();
   } finally { el.classList.remove("pdf-mode"); }
 }
 
@@ -163,7 +163,7 @@ function ListView({ list, onNew, onOpen, onDuplicate, onDelete, onPrint, onImpor
     if (!f) return;
     try {
       const res = validateImport(JSON.parse(await f.text()));
-      if (!res.ok) return toast.error(res.error);
+      if (!res.ok) { toast.error(res.error); return; }
       onImport(res.evaluation);
     } catch { toast.error("File non leggibile: JSON non valido."); }
     if (fileRef.current) fileRef.current.value = "";
@@ -245,7 +245,7 @@ function Checklist({ title, subtitle, items, answers, onChange }: { title: strin
       </div>
       <div className="divide-y divide-border">
         {items.map((it) => {
-          const a = answers[it.ref];
+          const a = answers[it.ref] ?? { esito: "" as Esito, note: "" };
           return (
             <div key={it.ref} className="grid gap-3 p-4 md:grid-cols-[4rem_1fr_auto]">
               <span className="font-mono text-sm font-bold text-primary">{it.ref}</span>
@@ -362,7 +362,7 @@ function Settings({ initial, onSave, onExit }: { initial: Company; onSave: (c: C
   const set = (k: keyof Company, v: string) => setC((x) => ({ ...x, [k]: v }));
   const onLogo = (f?: File) => {
     if (!f) return;
-    if (f.size > 1_500_000) return toast.error("Logo troppo grande (max 1,5 MB).");
+    if (f.size > 1_500_000) { toast.error("Logo troppo grande (max 1,5 MB)."); return; }
     const r = new FileReader(); r.onload = () => set("logo", String(r.result)); r.readAsDataURL(f);
   };
   return (
