@@ -62,15 +62,18 @@
 }
 
 :root {
-  --radius: 0.625rem;
-  --background: oklch(1 0 0);
+  --radius: 0.5rem;
+  --warn: oklch(0.72 0.15 70);
+  --report-head: oklch(0.95 0.01 160);
+  --report-line: oklch(0.55 0 0);
+  --background: oklch(0.975 0.006 95);
   --foreground: oklch(0.129 0.042 264.695);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.129 0.042 264.695);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.129 0.042 264.695);
-  --primary: oklch(0.208 0.042 265.755);
-  --primary-foreground: oklch(0.984 0.003 247.858);
+  --primary: oklch(0.45 0.09 165);
+  --primary-foreground: oklch(0.985 0.01 160);
   --secondary: oklch(0.968 0.007 247.896);
   --secondary-foreground: oklch(0.208 0.042 265.755);
   --muted: oklch(0.968 0.007 247.896);
@@ -141,4 +144,23 @@
     background-color: var(--color-background);
     color: var(--color-foreground);
   }
+}
+
+body { font-family: "IBM Plex Sans", system-ui, sans-serif; }
+.font-mono { font-family: "IBM Plex Mono", ui-monospace, monospace; }
+.font-serif-report { font-family: "IBM Plex Serif", Georgia, serif; }
+.report-paper { box-shadow: 0 2px 20px oklch(0 0 0 / 0.12); }
+.pdf-mode { box-shadow: none !important; }
+.pdf-mode [contenteditable] { outline: none !important; background: transparent !important; }
+@page { size: A4; margin: 0; }
+@media print {
+  body { background: white !important; }
+  .no-print, header.no-print { display: none !important; }
+  .report-wrap { padding: 0 !important; background: none !important; overflow: visible !important; }
+  .report-paper { box-shadow: none !important; width: 100% !important; }
+  [contenteditable] { outline: none !important; background: transparent !important; }
+  main { padding: 0 !important; max-width: none !important; }
+  body * { visibility: hidden; }
+  #report-doc, #report-doc * { visibility: visible; }
+  #report-doc { position: absolute; left: 0; top: 0; }
 }
