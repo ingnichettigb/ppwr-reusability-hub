@@ -1,4 +1,15 @@
+/**
+ * File: Report.tsx
+ * Percorso di destinazione: src/components/ppwr/Report.tsx
+ * Progetto: ppwr-reusability-hub (PPWR Reusability Hub)
+ * Ultima revisione: 2026-10-22
+ * Descrizione: Documento del report di riutilizzabilità (anteprima, stampa e PDF).
+ * Modifiche:
+ *  - 2026-10-22: aggiunto il logo "PPWR Reusability Hub" (src/assets/logo-ppwr-hub.png)
+ *    nell'intestazione del report, a destra; il logo aziendale a sinistra resta invariato.
+ */
 import { useEffect, useRef } from "react";
+import hubLogo from "@/assets/logo-ppwr-hub.png";
 import { ALL6B, ART11, SISTEMA, rotationIndex, computeOutcome, defaultConclusion, defaultIntro, fmtDate, NOTA_NORMATIVA, type Company, type Evaluation, type CheckItem, type Answer } from "@/lib/ppwr";
 
 const label = (e: string) => (e === "SI" ? "SÌ" : e === "NO" ? "NO" : e === "NA" ? "N/A" : "—");
@@ -70,9 +81,13 @@ export function Report({ ev, company, editable, onChange }: { ev: Evaluation; co
             <div>{[company.telefono, company.email, company.sito].filter(Boolean).join(" · ")}</div>
           </div>
         </div>
-        <div className="text-right text-[11px] font-mono">
-          <div>Rif. Reg. UE 2025/40</div>
-          <div>Data: {fmtDate(ev.updatedAt)}</div>
+        <div className="flex items-start gap-3">
+          <div className="text-right text-[11px] font-mono">
+            <div className="font-sans text-[12px] font-extrabold leading-tight text-[#064a25]">PPWR<br />Reusability Hub</div>
+            <div className="mt-1">Rif. Reg. UE 2025/40</div>
+            <div>Data: {fmtDate(ev.updatedAt)}</div>
+          </div>
+          <img src={hubLogo} alt="Logo PPWR Reusability Hub" className="h-14 w-auto object-contain" />
         </div>
       </header>
 
