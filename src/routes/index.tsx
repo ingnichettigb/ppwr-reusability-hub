@@ -1,13 +1,19 @@
-/**
- * File: index.tsx
- * Percorso di destinazione: src/routes/index.tsx
- * Progetto: ppwr-reusability-hub (PPWR Reusability Hub)
- * Ultima revisione: 2026-10-22
- * Descrizione: Pagina principale: elenco valutazioni, editor, impostazioni ditta, anteprima report, stampa e PDF.
- * Modifiche:
- *  - 2026-10-22: downloadPdf applica margini di 12 mm su tutte le pagine e rispetta il salto
- *    pagina forzato dopo la prima pagina del report (elementi con classe "page-end").
- */
+/* ==============================================================================
+ *  TITOLO FILE      : index.tsx - Pagina principale dell'applicazione
+ *  PERCORSO         : src/routes/index.tsx
+ *  PROGETTO         : ppwr-reusability-hub (PPWR Reusability Hub)
+ *  REVISIONE        : 02
+ *  DATA E ORA REV.  : 2026-10-22 21:02 (ora italiana)
+ * ------------------------------------------------------------------------------
+ *  DESCRIZIONE
+ *    Pagina principale: elenco valutazioni, editor, impostazioni ditta, anteprima report,
+ *    stampa e generazione del PDF (funzione downloadPdf).
+ * ------------------------------------------------------------------------------
+ *  STORICO REVISIONI (dalla più recente)
+ *    Rev. 02 | 2026-10-22 21:02 | Intestazione del file riscritta in formato standard (nessuna modifica al codice).
+ *    Rev. 01 | 2026-10-22 20:38 | downloadPdf: margini di 12 mm su tutte le pagine e salto pagina forzato
+ *                                  dopo la prima pagina del report (elementi con classe "page-end").
+ * ============================================================================== */
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { toast } from "sonner";

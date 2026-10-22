@@ -1,14 +1,18 @@
-/**
- * File: styles.css
- * Percorso di destinazione: src/styles.css
- * Progetto: ppwr-reusability-hub (PPWR Reusability Hub)
- * Ultima revisione: 2026-10-22
- * Descrizione: Stili globali, token del tema e regole di stampa/PDF del report.
- * Modifiche:
- *  - 2026-10-22: margine pagina 12 mm in stampa (@page); prima pagina del report a foglio
- *    intero (.report-cover) con salto pagina; modalità PDF a larghezza A4 fissa e senza
- *    padding verticale (i margini sono applicati da downloadPdf in routes/index.tsx).
- */
+/* ==============================================================================
+ *  TITOLO FILE      : styles.css - Stili globali e regole di stampa/PDF
+ *  PERCORSO         : src/styles.css
+ *  PROGETTO         : ppwr-reusability-hub (PPWR Reusability Hub)
+ *  REVISIONE        : 02
+ *  DATA E ORA REV.  : 2026-10-22 21:02 (ora italiana)
+ * ------------------------------------------------------------------------------
+ *  DESCRIZIONE
+ *    Stili globali, token del tema e regole di stampa/PDF del report.
+ * ------------------------------------------------------------------------------
+ *  STORICO REVISIONI (dalla più recente)
+ *    Rev. 02 | 2026-10-22 21:02 | Intestazione del file riscritta in formato standard (nessuna modifica agli stili).
+ *    Rev. 01 | 2026-10-22 20:38 | Margine pagina 12 mm in stampa; prima pagina del report a foglio intero
+ *                                  (.report-cover) con salto pagina; modalità PDF a larghezza A4 fissa.
+ * ============================================================================== */
 @import "tailwindcss" source(none);
 @source "../src";
 @import "tw-animate-css";

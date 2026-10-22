@@ -1,23 +1,23 @@
-/**
- * File: Report.tsx
- * Percorso di destinazione: src/components/ppwr/Report.tsx
- * Progetto: ppwr-reusability-hub (PPWR Reusability Hub)
- * Ultima revisione: 2026-10-22
- * Descrizione: Documento del report di riutilizzabilità (anteprima, stampa e PDF).
- * Modifiche:
- *  - 2026-10-22: aggiunto il logo "PPWR Reusability Hub" (src/assets/logo-ppwr-hub.png)
- *    nell'intestazione del report, a destra; il logo aziendale a sinistra resta invariato.
- *  - 2026-10-22: nuova prima pagina (A4 intera) con intestazione, titolo, dati essenziali,
- *    esito e barra "Requisiti soddisfatti" colorata in base all'esito; introduzione, dati
- *    completi e sezioni 1-5 dalla pagina 2.
- *  - 2026-10-22: riquadro finale "Esito e conclusioni" ridisegnato (icona, caselle SÌ/NO/N/A/
- *    da compilare, barra con la dicitura "Indicatore di completezza della checklist").
- *  - 2026-10-22: margini laterali 12 mm (quelli verticali sono gestiti da PDF/stampa).
- *  - 2026-10-22: riquadro finale "Esito e conclusioni" compattato (altezza circa dimezzata):
- *    esito e caselle SÌ/NO/N/A/Da compilare sulla stessa riga, barra più sottile.
- *  - 2026-10-22: risultato in prima pagina compattato (altezza circa dimezzata): esito,
- *    "Requisiti soddisfatti" e percentuale sulla stessa riga, barra sottile sotto.
- */
+/* ==============================================================================
+ *  TITOLO FILE      : Report.tsx - Documento del report di riutilizzabilità
+ *  PERCORSO         : src/components/ppwr/Report.tsx
+ *  PROGETTO         : ppwr-reusability-hub (PPWR Reusability Hub)
+ *  REVISIONE        : 05
+ *  DATA E ORA REV.  : 2026-10-22 21:02 (ora italiana)
+ * ------------------------------------------------------------------------------
+ *  DESCRIZIONE
+ *    Documento del report di riutilizzabilità dell'imballaggio (anteprima, stampa e PDF).
+ *    Pagina 1: intestazione, titolo, dati essenziali, esito e barra "Requisiti soddisfatti".
+ *    Dalla pagina 2: introduzione, dati completi, sezioni 1-5, note e firma.
+ * ------------------------------------------------------------------------------
+ *  STORICO REVISIONI (dalla più recente)
+ *    Rev. 05 | 2026-10-22 21:02 | Intestazione del file riscritta in formato standard (nessuna modifica al codice).
+ *    Rev. 04 | 2026-10-22 20:52 | Risultato in prima pagina compattato (altezza circa dimezzata).
+ *    Rev. 03 | 2026-10-22 20:44 | Riquadro finale "Esito e conclusioni" compattato (altezza circa dimezzata).
+ *    Rev. 02 | 2026-10-22 20:38 | Nuova prima pagina A4 con barra di conformità; riquadro finale ridisegnato;
+ *                                  margini laterali 12 mm; introduzione e sezioni dalla pagina 2.
+ *    Rev. 01 | 2026-10-22 20:17 | Aggiunto il logo PPWR Reusability Hub nell'intestazione del report.
+ * ============================================================================== */
 import { useEffect, useRef } from "react";
 import { Check, TriangleAlert, X } from "lucide-react";
 import hubLogo from "@/assets/logo-ppwr-hub.png";
