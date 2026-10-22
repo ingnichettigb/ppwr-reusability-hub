@@ -186,6 +186,11 @@ function ListView({ list, onNew, onOpen, onDuplicate, onDelete, onPrint, onImpor
 
   const handleFile = async (f?: File) => {
     if (!f) return;
+    if (!/^\d{12}-RIUTILIZZO-PPWR-.+\.json$/i.test(f.name)) {
+      toast.error("File non ammesso: il nome deve essere nel formato AAAAMMGGHHmm-RIUTILIZZO-PPWR-titolo.json");
+      if (fileRef.current) fileRef.current.value = "";
+      return;
+    }
     try {
       const res = validateImport(JSON.parse(await f.text()));
       if (!res.ok) { toast.error(res.error); return; }
@@ -202,7 +207,7 @@ function ListView({ list, onNew, onOpen, onDuplicate, onDelete, onPrint, onImpor
           <h1 className="text-3xl font-semibold tracking-tight">Valutazioni di riutilizzabilità</h1>
         </div>
         <div className="flex gap-2">
-          <input ref={fileRef} type="file" accept="application/json,.json" className="hidden" onChange={(e) => handleFile(e.target.files?.[0])} />
+          <input ref={fileRef} type="file" accept=".json" title="Solo file *-RIUTILIZZO-PPWR-*.json" className="hidden" onChange={(e) => handleFile(e.target.files?.[0])} />
           <button className={btnGhost} onClick={() => fileRef.current?.click()}><Upload className="h-4 w-4" /> Importa JSON</button>
           <button className={btnPrimary} onClick={onNew}><Plus className="h-4 w-4" /> Nuova valutazione</button>
         </div>
