@@ -3,17 +3,17 @@ import { computeOutcome, newEvaluation, rotationIndex, SISTEMA, validateImport, 
 
 const allSi = () => {
   const e = newEvaluation();
-  for (const s of ["art11", "all6b", "sistema"] as const) for (const k of Object.keys(e[s])) e[s][k].esito = "SI";
+  for (const s of ["art11", "all6b", "sistema"] as const) for (const k of Object.keys(e[s])) e[s][k]!.esito = "SI";
   return e;
 };
 
 describe("regole PPWR", () => {
   it("un NO nel sistema di riutilizzo rende NON IDONEO", () => {
-    const e = allSi(); e.sistema[SISTEMA[0].ref].esito = "NO";
+    const e = allSi(); e.sistema[SISTEMA[0]!.ref]!.esito = "NO";
     expect(computeOutcome(e).outcome).toBe("NON IDONEO");
   });
   it("voce del sistema vuota rende INCOMPLETO", () => {
-    const e = allSi(); e.sistema["S4"].esito = "";
+    const e = allSi(); e.sistema["S4"]!.esito = "";
     expect(computeOutcome(e).outcome).toBe("INCOMPLETO");
   });
   it("tutto SÌ è IDONEO su 23 voci", () => {
