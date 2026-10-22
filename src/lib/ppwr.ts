@@ -31,6 +31,23 @@ export const ALL6B: CheckItem[] = [
   { ref: "Finale", text: "Il prodotto ricondizionato rispetta le prescrizioni in materia di salute e di sicurezza ad esso applicabili." },
 ];
 
+export const SISTEMA: CheckItem[] = [
+  { ref: "S1", text: "È definito il sistema di riutilizzo in cui l'imballaggio è immesso (circuito chiuso, circuito aperto/pooling o sistema misto)." },
+  { ref: "S2", text: "Esiste un sistema di raccolta/logistica inversa che consente la restituzione dell'imballaggio dopo l'uso." },
+  { ref: "S3", text: "Sono previsti incentivi alla restituzione (cauzione, accordo contrattuale, noleggio o equivalente)." },
+  { ref: "S4", text: "L'imballaggio è identificabile e tracciabile in modo univoco (matricola, barcode, DataMatrix, RFID)." },
+  { ref: "S5", text: "Il numero di rotazioni effettuate è registrato e monitorato nel tempo." },
+  { ref: "S6", text: "Sono disponibili evidenze documentali (schede tecniche, certificati di ricondizionamento, omologazioni UN/ADR, test MOCA ove applicabili)." },
+];
+
+export const TIPI_SISTEMA = ["Circuito chiuso", "Circuito aperto (pooling)", "Sistema misto"];
+
+export function rotationIndex(i: Imballo): number | null {
+  const p = Number(i.rotazioniPreviste), f = Number(i.rotazioniEffettuate);
+  if (!p || p <= 0 || isNaN(f)) return null;
+  return Math.round((f / p) * 100);
+}
+
 export const TIPOLOGIE = ["IBC", "Fusto metallico", "Fusto plastico", "Pallet in legno", "Pallet in plastica", "Cassetta", "Big bag (FIBC)", "Tanica", "Cisternetta", "Altro"];
 export const SETTORI = ["Alimentare", "Chimico", "Farmaceutico", "Cosmetico", "Industriale", "Agricolo", "Logistica", "Altro"];
 
@@ -46,6 +63,9 @@ export interface Imballo {
   rotazioniPreviste: string;
   rotazioniEffettuate: string;
   descrizione: string;
+  tipoSistema: string;
+  tracciabilita: string;
+  evidenze: string;
 }
 
 export interface Evaluation {
@@ -56,6 +76,7 @@ export interface Evaluation {
   imballo: Imballo;
   art11: Record<string, Answer>;
   all6b: Record<string, Answer>;
+  sistema: Record<string, Answer>;
   report: { introduzione: string; conclusioni: string; noteGenerali: string };
 }
 
@@ -82,9 +103,10 @@ export function newEvaluation(): Evaluation {
     title: "Nuova valutazione",
     createdAt: now,
     updatedAt: now,
-    imballo: { tipologia: "IBC", modello: "", materiale: "", dimensioni: "", capacita: "", settore: "Industriale", rotazioniPreviste: "", rotazioniEffettuate: "", descrizione: "" },
+    imballo: { tipologia: "IBC", modello: "", materiale: "", dimensioni: "", capacita: "", settore: "Industriale", rotazioniPreviste: "", rotazioniEffettuate: "", descrizione: "", tipoSistema: "", tracciabilita: "", evidenze: "" },
     art11: blankAnswers(ART11),
     all6b: blankAnswers(ALL6B),
+    sistema: blankAnswers(SISTEMA),
     report: { introduzione: "", conclusioni: "", noteGenerali: "" },
   };
 }
@@ -92,7 +114,7 @@ export function newEvaluation(): Evaluation {
 export type Outcome = "IDONEO" | "NON IDONEO" | "INCOMPLETO";
 
 export function computeOutcome(e: Evaluation) {
-  const all = [...ART11.map((i) => e.art11[i.ref]), ...ALL6B.map((i) => e.all6b[i.ref])];
+  const all = [...ART11.map((i) => e.art11[i.ref]), ...ALL6B.map((i) => e.all6b[i.ref]), ...SISTEMA.map((i) => e.sistema?.[i.ref])];
   const si = all.filter((a) => a?.esito === "SI").length;
   const no = all.filter((a) => a?.esito === "NO").length;
   const na = all.filter((a) => a?.esito === "NA").length;
@@ -105,7 +127,7 @@ export function computeOutcome(e: Evaluation) {
 
 export function defaultIntro(e: Evaluation) {
   const i = e.imballo;
-  return `Il presente documento fornisce una valutazione della conformità dell'imballaggio ${i.tipologia}${i.modello ? ` – ${i.modello}` : ""} ai requisiti previsti dal Regolamento UE 2025/40 (PPWR), con particolare riferimento all'Articolo 11 (Imballaggi riutilizzabili) e all'Allegato VI, Parte B (Operazioni di ricondizionamento). L'obiettivo è verificare l'idoneità dell'imballaggio al riutilizzo mediante la verifica puntuale dei criteri progettuali, igienico-sanitari e manutentivi stabiliti dalla normativa europea.`;
+  return `Il presente documento fornisce una valutazione della conformità dell'imballaggio ${i.tipologia}${i.modello ? ` – ${i.modello}` : ""} ai requisiti previsti dal Regolamento UE 2025/40 (PPWR), con particolare riferimento all'Articolo 11 (Imballaggi riutilizzabili) e all'Allegato VI, Parte B (Operazioni di ricondizionamento), oltre ai requisiti del sistema di riutilizzo. L'obiettivo è verificare l'idoneità dell'imballaggio al riutilizzo mediante la verifica puntuale dei criteri progettuali, igienico-sanitari e manutentivi stabiliti dalla normativa europea.`;
 }
 
 export function defaultConclusion(e: Evaluation) {
@@ -135,8 +157,13 @@ export function buildFileName(title: string, ext: "pdf" | "json", d = new Date()
 const K_EVALS = "ppwr.evaluations.v1";
 const K_COMPANY = "ppwr.company.v1";
 
+export function normalizeEvaluation(e: Evaluation): Evaluation {
+  const base = newEvaluation();
+  return { ...e, imballo: { ...base.imballo, ...e.imballo }, sistema: { ...base.sistema, ...(e.sistema || {}) }, report: { ...base.report, ...(e.report || {}) } };
+}
+
 export function loadEvaluations(): Evaluation[] {
-  try { return JSON.parse(localStorage.getItem(K_EVALS) || "[]"); } catch { return []; }
+  try { return (JSON.parse(localStorage.getItem(K_EVALS) || "[]") as Evaluation[]).map(normalizeEvaluation); } catch { return []; }
 }
 export function saveEvaluations(list: Evaluation[]) { localStorage.setItem(K_EVALS, JSON.stringify(list)); }
 export function loadCompany(): Company {
@@ -184,6 +211,7 @@ export function validateImport(raw: unknown): { ok: true; evaluation: Evaluation
     ...base,
     ...(e as unknown as Evaluation),
     imballo: { ...base.imballo, ...(e.imballo as Imballo) },
+    sistema: { ...base.sistema, ...((e.sistema as Evaluation["sistema"]) || {}) },
     report: { ...base.report, ...((e.report as Evaluation["report"]) || {}) },
     id: crypto.randomUUID(),
     updatedAt: new Date().toISOString(),

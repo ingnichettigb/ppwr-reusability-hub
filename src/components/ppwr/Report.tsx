@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { ALL6B, ART11, computeOutcome, defaultConclusion, defaultIntro, fmtDate, NOTA_NORMATIVA, type Company, type Evaluation, type CheckItem, type Answer } from "@/lib/ppwr";
+import { ALL6B, ART11, SISTEMA, rotationIndex, computeOutcome, defaultConclusion, defaultIntro, fmtDate, NOTA_NORMATIVA, type Company, type Evaluation, type CheckItem, type Answer } from "@/lib/ppwr";
 
 const label = (e: string) => (e === "SI" ? "SÌ" : e === "NO" ? "NO" : e === "NA" ? "N/A" : "—");
 
@@ -98,11 +98,21 @@ export function Report({ ev, company, editable, onChange }: { ev: Evaluation; co
       <h2 className="mt-6 mb-2 text-[14px] font-bold uppercase tracking-wide">2. Processi di ricondizionamento – Allegato VI, Parte B</h2>
       <Table items={ALL6B} answers={ev.all6b} refLabel="Punto" />
 
-      <h2 className="mt-6 mb-1 text-[14px] font-bold uppercase tracking-wide">3. Nota normativa</h2>
+      <h2 className="mt-6 mb-2 text-[14px] font-bold uppercase tracking-wide">3. Sistema di riutilizzo e tracciabilità</h2>
+      <table className="mb-3 w-full border-collapse text-[12px]">
+        <tbody>
+          {([["Tipo di sistema", i.tipoSistema], ["Identificazione / tracciabilità", i.tracciabilita], ["Indice di utilizzo", rotationIndex(i) === null ? "" : `${rotationIndex(i)}% (${i.rotazioniEffettuate} su ${i.rotazioniPreviste} rotazioni previste)`], ["Evidenze documentali", i.evidenze]] as const).map(([k, v]) => (
+            <tr key={k}><td className="border border-[var(--report-line)] p-1.5 w-1/3 bg-[var(--report-head)] font-semibold">{k}</td><td className="border border-[var(--report-line)] p-1.5 whitespace-pre-wrap">{v || "—"}</td></tr>
+          ))}
+        </tbody>
+      </table>
+      <Table items={SISTEMA} answers={ev.sistema ?? {}} refLabel="Rif." />
+
+      <h2 className="mt-6 mb-1 text-[14px] font-bold uppercase tracking-wide">4. Nota normativa</h2>
       <p className="italic text-[12px]">{NOTA_NORMATIVA}</p>
 
       <div style={{ breakInside: "avoid" }}>
-        <h2 className="mt-6 mb-2 text-[14px] font-bold uppercase tracking-wide">4. Esito e conclusioni</h2>
+        <h2 className="mt-6 mb-2 text-[14px] font-bold uppercase tracking-wide">5. Esito e conclusioni</h2>
         <div className={`mb-3 flex items-center justify-between border-2 ${tone} px-4 py-2`}>
           <span className="text-[16px] font-bold">ESITO: {res.outcome}</span>
           <span className="font-mono text-[11px] text-[#1a1a1a]">SÌ {res.si} · NO {res.no} · N/A {res.na} · da compilare {res.vuoti} · conformità {res.score}%</span>
