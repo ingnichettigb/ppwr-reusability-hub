@@ -15,6 +15,8 @@
  *  - 2026-10-22: margini laterali 12 mm (quelli verticali sono gestiti da PDF/stampa).
  *  - 2026-10-22: riquadro finale "Esito e conclusioni" compattato (altezza circa dimezzata):
  *    esito e caselle SÌ/NO/N/A/Da compilare sulla stessa riga, barra più sottile.
+ *  - 2026-10-22: risultato in prima pagina compattato (altezza circa dimezzata): esito,
+ *    "Requisiti soddisfatti" e percentuale sulla stessa riga, barra sottile sotto.
  */
 import { useEffect, useRef } from "react";
 import { Check, TriangleAlert, X } from "lucide-react";
@@ -36,17 +38,19 @@ function outcomeText(outcome: string, vuoti: number) {
   return vuoti > 0 ? `Valutazione incompleta: ${vuoti} ${vuoti === 1 ? "voce" : "voci"} ancora da compilare.` : "Valutazione incompleta.";
 }
 
-function ConformityBar({ score, outcome, big, compact }: { score: number; outcome: string; big?: boolean; compact?: boolean }) {
+function ConformityBar({ score, outcome, big, compact, barOnly }: { score: number; outcome: string; big?: boolean; compact?: boolean; barOnly?: boolean }) {
   const t = toneOf(outcome);
   return (
     <div className="font-sans">
-      <div className="flex items-end justify-between">
-        <span className={`font-bold ${big ? "text-[18px]" : compact ? "text-[13px]" : "text-[15px]"}`}>Requisiti soddisfatti</span>
-        <span className={`font-extrabold leading-none ${big ? "text-[46px]" : compact ? "text-[20px]" : "text-[30px]"}`}>{score}%</span>
-      </div>
+      {!barOnly && (
+        <div className="flex items-end justify-between">
+          <span className={`font-bold ${big ? "text-[18px]" : compact ? "text-[13px]" : "text-[15px]"}`}>Requisiti soddisfatti</span>
+          <span className={`font-extrabold leading-none ${big ? "text-[46px]" : compact ? "text-[20px]" : "text-[30px]"}`}>{score}%</span>
+        </div>
+      )}
       <div
         role="progressbar" aria-valuenow={score} aria-valuemin={0} aria-valuemax={100} aria-label="Requisiti soddisfatti"
-        className={`overflow-hidden rounded-full border-2 border-[#1a1a1a] bg-white ${big ? "mt-2 h-9" : compact ? "mt-1 h-4" : "mt-2 h-6"}`}
+        className={`overflow-hidden rounded-full border-2 border-[#1a1a1a] bg-white ${big ? "mt-2 h-9" : barOnly ? "h-4" : compact ? "mt-1 h-4" : "mt-2 h-6"}`}
       >
         <div
           className={`h-full ${t.fill}`}
@@ -157,15 +161,21 @@ export function Report({ ev, company, editable, onChange }: { ev: Evaluation; co
         </dl>
 
         <div className="mt-auto">
-          <div className="font-sans text-[12px] font-bold uppercase tracking-[0.2em] text-[#064a25]">Risultato della valutazione</div>
-          <div className={`mt-2 flex items-center gap-5 rounded-md border-2 ${tone.border} p-4`}>
-            <div className={`grid h-16 w-16 shrink-0 place-items-center rounded-full ${tone.iconBg}`}><Icon className="h-10 w-10" strokeWidth={3.5} aria-hidden /></div>
-            <div>
-              <div className="font-sans text-[30px] font-extrabold leading-none">ESITO: {res.outcome}</div>
-              <div className="mt-2 font-sans text-[14px]">{outcomeText(res.outcome, res.vuoti)}</div>
+          <div className="font-sans text-[11px] font-bold uppercase tracking-[0.2em] text-[#064a25]">Risultato della valutazione</div>
+          <div className={`mt-1.5 rounded-md border-2 ${tone.border} p-3`}>
+            <div className="flex items-center gap-3 font-sans">
+              <div className={`grid h-11 w-11 shrink-0 place-items-center rounded-full ${tone.iconBg}`}><Icon className="h-7 w-7" strokeWidth={3.5} aria-hidden /></div>
+              <div>
+                <div className="text-[24px] font-extrabold leading-none">ESITO: {res.outcome}</div>
+                <div className="mt-1 text-[12px] leading-tight">{outcomeText(res.outcome, res.vuoti)}</div>
+              </div>
+              <div className="ml-auto text-right">
+                <div className="text-[12px] font-bold leading-tight">Requisiti soddisfatti</div>
+                <div className="text-[30px] font-extrabold leading-none">{res.score}%</div>
+              </div>
             </div>
+            <div className="mt-2"><ConformityBar score={res.score} outcome={res.outcome} compact barOnly /></div>
           </div>
-          <div className="mt-6"><ConformityBar score={res.score} outcome={res.outcome} big /></div>
         </div>
       </section>
 
