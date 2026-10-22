@@ -57,7 +57,7 @@ async function downloadPdf(ev: Evaluation) {
       let end = Math.min(y + pagePx, canvas.height);
       if (end < canvas.height) {
         const cand = breaks.filter((b) => b > y + pagePx * 0.5 && b <= end);
-        if (cand.length) end = cand[cand.length - 1];
+        if (cand.length) end = cand[cand.length - 1]!;
       }
       const slice = document.createElement("canvas");
       slice.width = canvas.width; slice.height = end - y;
