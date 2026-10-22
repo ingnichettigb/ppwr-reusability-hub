@@ -5,7 +5,7 @@ import {
   Building2, Copy, Eye, FileDown, FileJson, LogOut, Pencil, Plus, Printer, Save, Trash2, Upload, FileText, Recycle, ArrowLeft,
 } from "lucide-react";
 import {
-  ALL6B, ART11, SETTORI, TIPOLOGIE, buildFileName, computeOutcome, exportJson, fmtDate, loadCompany, loadEvaluations,
+  ALL6B, ART11, SISTEMA, TIPI_SISTEMA, rotationIndex, SETTORI, TIPOLOGIE, buildFileName, computeOutcome, exportJson, fmtDate, loadCompany, loadEvaluations,
   newEvaluation, saveCompany, saveEvaluations, validateImport, type CheckItem, type Company, type Esito, type Evaluation, type Outcome,
 } from "@/lib/ppwr";
 import { Report } from "@/components/ppwr/Report";
@@ -39,14 +39,39 @@ function OutcomeBadge({ o }: { o: Outcome }) {
 async function downloadPdf(ev: Evaluation) {
   const el = document.getElementById("report-doc");
   if (!el) return;
-  const html2pdf = (await import("html2pdf.js")).default;
+  const [{ default: html2canvas }, { jsPDF }] = await Promise.all([import("html2canvas-pro"), import("jspdf")]);
   el.classList.add("pdf-mode");
   try {
-    await html2pdf().set({
-      margin: 0, filename: buildFileName(ev.title, "pdf"),
-      image: { type: "jpeg", quality: 0.96 }, html2canvas: { scale: 2, useCORS: true },
-      jsPDF: { unit: "mm", format: "a4", orientation: "portrait" }, pagebreak: { mode: ["css", "legacy"] },
-    } as any).from(el).save();
+    const canvas = await html2canvas(el, { scale: 2, useCORS: true, backgroundColor: "#ffffff" });
+    const pdf = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
+    const pageW = 210, pageH = 297;
+    // pixel height of one A4 page at the canvas width
+    const pagePx = Math.floor((canvas.width * pageH) / pageW);
+    // collect safe break points (bottom of table rows / blocks) so pages don't cut a row in half
+    const scale = canvas.width / el.getBoundingClientRect().width;
+    const top0 = el.getBoundingClientRect().top;
+    const breaks = Array.from(el.querySelectorAll("tr, h2, p, header, section, div.avoid-break"))
+      .map((n) => Math.round((n.getBoundingClientRect().bottom - top0) * scale)).sort((a, b) => a - b);
+    let y = 0, first = true;
+    while (y < canvas.height - 2) {
+      let end = Math.min(y + pagePx, canvas.height);
+      if (end < canvas.height) {
+        const cand = breaks.filter((b) => b > y + pagePx * 0.5 && b <= end);
+        if (cand.length) end = cand[cand.length - 1];
+      }
+      const slice = document.createElement("canvas");
+      slice.width = canvas.width; slice.height = end - y;
+      const ctx = slice.getContext("2d")!;
+      ctx.fillStyle = "#ffffff"; ctx.fillRect(0, 0, slice.width, slice.height);
+      ctx.drawImage(canvas, 0, y, canvas.width, end - y, 0, 0, canvas.width, end - y);
+      if (!first) pdf.addPage();
+      pdf.addImage(slice.toDataURL("image/jpeg", 0.95), "JPEG", 0, 0, pageW, ((end - y) * pageW) / canvas.width);
+      first = false; y = end;
+    }
+    pdf.save(buildFileName(ev.title, "pdf"));
+  } catch (err) {
+    console.error(err);
+    toast.error("Impossibile generare il PDF. Prova con Stampa → Salva come PDF.");
   } finally { el.classList.remove("pdf-mode"); }
 }
 
@@ -273,8 +298,8 @@ function Editor({ initial, onSave, onExit, onPreview }: { initial: Evaluation; o
   const r = computeOutcome(ev);
   const upd = (fn: (e: Evaluation) => Evaluation) => { setEv(fn); setDirty(true); };
   const setI = (k: keyof Evaluation["imballo"], v: string) => upd((e) => ({ ...e, imballo: { ...e.imballo, [k]: v } }));
-  const setA = (sec: "art11" | "all6b") => (ref: string, k: "esito" | "note", v: string) => upd((e) => ({ ...e, [sec]: { ...e[sec], [ref]: { ...e[sec][ref], [k]: v } } }));
-  const setAll = (v: Esito) => upd((e) => ({ ...e, art11: Object.fromEntries(Object.entries(e.art11).map(([k, a]) => [k, { ...a, esito: v }])), all6b: Object.fromEntries(Object.entries(e.all6b).map(([k, a]) => [k, { ...a, esito: v }])) }));
+  const setA = (sec: "art11" | "all6b" | "sistema") => (ref: string, k: "esito" | "note", v: string) => upd((e) => ({ ...e, [sec]: { ...e[sec], [ref]: { ...e[sec][ref], [k]: v } } }));
+  const setAll = (v: Esito) => upd((e) => ({ ...e, art11: Object.fromEntries(Object.entries(e.art11).map(([k, a]) => [k, { ...a, esito: v }])), all6b: Object.fromEntries(Object.entries(e.all6b).map(([k, a]) => [k, { ...a, esito: v }])), sistema: Object.fromEntries(Object.entries(e.sistema).map(([k, a]) => [k, { ...a, esito: v }])) }));
   const exit = () => { if (dirty && !confirm("Ci sono modifiche non salvate. Uscire comunque?")) return; onExit(); };
 
   return (
@@ -310,6 +335,28 @@ function Editor({ initial, onSave, onExit, onPreview }: { initial: Evaluation; o
 
         <Checklist title="1. Articolo 11 – Imballaggi riutilizzabili" subtitle="Requisiti da (a) a (i) del Regolamento UE 2025/40" items={ART11} answers={ev.art11} onChange={setA("art11")} />
         <Checklist title="2. Allegato VI, Parte B – Ricondizionamento" subtitle="Fasi B2.a – B2.g e requisito finale di salute e sicurezza" items={ALL6B} answers={ev.all6b} onChange={setA("all6b")} />
+
+        <section className="rounded-lg border border-border bg-card p-4">
+          <h2 className="text-lg font-semibold">3. Sistema di riutilizzo e tracciabilità</h2>
+          <p className="mb-4 text-sm text-muted-foreground">Come l'imballaggio torna indietro, come viene identificato e quante rotazioni ha già fatto.</p>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Field label="Tipo di sistema">
+              <select className={input} value={ev.imballo.tipoSistema} onChange={(e) => setI("tipoSistema", e.target.value)}>
+                <option value="">— seleziona —</option>
+                {TIPI_SISTEMA.map((t) => <option key={t} value={t}>{t}</option>)}
+              </select>
+            </Field>
+            <Field label="Identificazione / tracciabilità"><input className={input} value={ev.imballo.tracciabilita} onChange={(e) => setI("tracciabilita", e.target.value)} placeholder="es. matricola + DataMatrix" /></Field>
+            <Field label="Evidenze documentali (schede, certificati, omologazioni)" className="sm:col-span-2"><textarea className={input} rows={2} value={ev.imballo.evidenze} onChange={(e) => setI("evidenze", e.target.value)} placeholder="es. Certificato UN 31HA1/Y n. …, scheda tecnica rev. 3" /></Field>
+          </div>
+          {(() => { const ri = rotationIndex(ev.imballo); return ri === null ? <p className="mt-3 text-xs text-muted-foreground">Inserisci rotazioni previste ed effettuate per calcolare l'indice di utilizzo.</p> : (
+            <div className="mt-4">
+              <div className="flex justify-between text-xs"><span>Indice di utilizzo (rotazioni effettuate / previste)</span><span className="font-mono font-bold">{ri}%</span></div>
+              <div className="mt-1 h-2 overflow-hidden rounded bg-muted"><div className={`h-full ${ri >= 100 ? "bg-[var(--warn)]" : "bg-primary"}`} style={{ width: `${Math.min(ri, 100)}%` }} /></div>
+              {ri >= 100 && <p className="mt-1 text-xs text-[var(--warn)]">Rotazioni previste raggiunte: verificare lo stato d'usura prima di un nuovo ciclo.</p>}
+            </div>); })()}
+        </section>
+        <Checklist title="4. Requisiti del sistema di riutilizzo" subtitle="Raccolta, incentivi alla restituzione, tracciabilità ed evidenze" items={SISTEMA} answers={ev.sistema} onChange={setA("sistema")} />
       </div>
 
       <aside className="no-print lg:sticky lg:top-4 lg:self-start space-y-4">
