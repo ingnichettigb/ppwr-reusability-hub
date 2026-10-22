@@ -1,3 +1,13 @@
+/**
+ * File: index.tsx
+ * Percorso di destinazione: src/routes/index.tsx
+ * Progetto: ppwr-reusability-hub (PPWR Reusability Hub)
+ * Ultima revisione: 2026-10-22
+ * Descrizione: Pagina principale: elenco valutazioni, editor, impostazioni ditta, anteprima report, stampa e PDF.
+ * Modifiche:
+ *  - 2026-10-22: downloadPdf applica margini di 12 mm su tutte le pagine e rispetta il salto
+ *    pagina forzato dopo la prima pagina del report (elementi con classe "page-end").
+ */
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { toast } from "sonner";
@@ -44,18 +54,24 @@ async function downloadPdf(ev: Evaluation) {
   try {
     const canvas = await html2canvas(el, { scale: 2, useCORS: true, backgroundColor: "#ffffff" });
     const pdf = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
-    const pageW = 210, pageH = 297;
-    // pixel height of one A4 page at the canvas width
-    const pagePx = Math.floor((canvas.width * pageH) / pageW);
+    const pageW = 210, pageH = 297, margin = 12; // mm
+    // pixel height of the printable area of one A4 page (margin top/bottom) at the canvas width
+    const pagePx = Math.floor((canvas.width * (pageH - 2 * margin)) / pageW);
     // collect safe break points (bottom of table rows / blocks) so pages don't cut a row in half
     const scale = canvas.width / el.getBoundingClientRect().width;
     const top0 = el.getBoundingClientRect().top;
     const breaks = Array.from(el.querySelectorAll("tr, h2, p, header, section, div.avoid-break"))
       .map((n) => Math.round((n.getBoundingClientRect().bottom - top0) * scale)).sort((a, b) => a - b);
+    // forced page breaks (e.g. end of the cover page)
+    const pageEnds = Array.from(el.querySelectorAll(".page-end"))
+      .map((n) => Math.round((n.getBoundingClientRect().bottom - top0) * scale)).sort((a, b) => a - b);
     let y = 0, first = true;
     while (y < canvas.height - 2) {
       let end = Math.min(y + pagePx, canvas.height);
-      if (end < canvas.height) {
+      const forced = pageEnds.find((b) => b > y + 2 && b <= y + pagePx + 2);
+      if (forced !== undefined) {
+        end = Math.min(forced, canvas.height);
+      } else if (end < canvas.height) {
         const cand = breaks.filter((b) => b > y + pagePx * 0.5 && b <= end);
         if (cand.length) end = cand[cand.length - 1]!;
       }
@@ -65,7 +81,7 @@ async function downloadPdf(ev: Evaluation) {
       ctx.fillStyle = "#ffffff"; ctx.fillRect(0, 0, slice.width, slice.height);
       ctx.drawImage(canvas, 0, y, canvas.width, end - y, 0, 0, canvas.width, end - y);
       if (!first) pdf.addPage();
-      pdf.addImage(slice.toDataURL("image/jpeg", 0.95), "JPEG", 0, 0, pageW, ((end - y) * pageW) / canvas.width);
+      pdf.addImage(slice.toDataURL("image/jpeg", 0.95), "JPEG", 0, margin, pageW, ((end - y) * pageW) / canvas.width);
       first = false; y = end;
     }
     pdf.save(buildFileName(ev.title, "pdf"));

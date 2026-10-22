@@ -7,10 +7,54 @@
  * Modifiche:
  *  - 2026-10-22: aggiunto il logo "PPWR Reusability Hub" (src/assets/logo-ppwr-hub.png)
  *    nell'intestazione del report, a destra; il logo aziendale a sinistra resta invariato.
+ *  - 2026-10-22: nuova prima pagina (A4 intera) con intestazione, titolo, dati essenziali,
+ *    esito e barra "Requisiti soddisfatti" colorata in base all'esito; introduzione, dati
+ *    completi e sezioni 1-5 dalla pagina 2.
+ *  - 2026-10-22: riquadro finale "Esito e conclusioni" ridisegnato (icona, caselle SÌ/NO/N/A/
+ *    da compilare, barra con la dicitura "Indicatore di completezza della checklist").
+ *  - 2026-10-22: margini laterali 12 mm (quelli verticali sono gestiti da PDF/stampa).
  */
 import { useEffect, useRef } from "react";
+import { Check, TriangleAlert, X } from "lucide-react";
 import hubLogo from "@/assets/logo-ppwr-hub.png";
 import { ALL6B, ART11, SISTEMA, rotationIndex, computeOutcome, defaultConclusion, defaultIntro, fmtDate, NOTA_NORMATIVA, type Company, type Evaluation, type CheckItem, type Answer } from "@/lib/ppwr";
+
+const CAPTION = "Indicatore di completezza della checklist";
+
+// Stile per esito: verde = IDONEO, rosso = NON IDONEO, ambra a righe = INCOMPLETO (leggibile anche in bianco e nero)
+function toneOf(outcome: string) {
+  if (outcome === "IDONEO") return { border: "border-primary", fill: "bg-primary", iconBg: "bg-primary text-white", Icon: Check, striped: false };
+  if (outcome === "NON IDONEO") return { border: "border-destructive", fill: "bg-destructive", iconBg: "bg-destructive text-white", Icon: X, striped: false };
+  return { border: "border-[var(--warn)]", fill: "bg-[var(--warn)]", iconBg: "bg-[var(--warn)] text-[#1a1a1a]", Icon: TriangleAlert, striped: true };
+}
+
+function outcomeText(outcome: string, vuoti: number) {
+  if (outcome === "IDONEO") return "Tutti i requisiti applicabili sono soddisfatti.";
+  if (outcome === "NON IDONEO") return "Almeno un requisito non è soddisfatto.";
+  return vuoti > 0 ? `Valutazione incompleta: ${vuoti} ${vuoti === 1 ? "voce" : "voci"} ancora da compilare.` : "Valutazione incompleta.";
+}
+
+function ConformityBar({ score, outcome, big }: { score: number; outcome: string; big?: boolean }) {
+  const t = toneOf(outcome);
+  return (
+    <div className="font-sans">
+      <div className="flex items-end justify-between">
+        <span className={`font-bold ${big ? "text-[18px]" : "text-[15px]"}`}>Requisiti soddisfatti</span>
+        <span className={`font-extrabold leading-none ${big ? "text-[46px]" : "text-[30px]"}`}>{score}%</span>
+      </div>
+      <div
+        role="progressbar" aria-valuenow={score} aria-valuemin={0} aria-valuemax={100} aria-label="Requisiti soddisfatti"
+        className={`mt-2 overflow-hidden rounded-full border-2 border-[#1a1a1a] bg-white ${big ? "h-9" : "h-6"}`}
+      >
+        <div
+          className={`h-full ${t.fill}`}
+          style={{ width: `${score}%`, ...(t.striped ? { backgroundImage: "repeating-linear-gradient(45deg, rgba(0,0,0,0.3) 0 6px, transparent 6px 12px)" } : {}) }}
+        />
+      </div>
+      <div className={`mt-1.5 text-[#333] ${big ? "text-[13px]" : "text-[12px]"}`}>{CAPTION}</div>
+    </div>
+  );
+}
 
 const label = (e: string) => (e === "SI" ? "SÌ" : e === "NO" ? "NO" : e === "NA" ? "N/A" : "—");
 
@@ -67,34 +111,66 @@ export function Report({ ev, company, editable, onChange }: { ev: Evaluation; co
     ["Dimensioni", i.dimensioni], ["Capacità", i.capacita], ["Settore d'uso", i.settore],
     ["Rotazioni previste", i.rotazioniPreviste], ["Rotazioni effettuate", i.rotazioniEffettuate],
   ];
-  const tone = res.outcome === "IDONEO" ? "border-primary text-primary" : res.outcome === "NON IDONEO" ? "border-destructive text-destructive" : "border-[var(--warn)] text-[var(--warn)]";
+  const tone = toneOf(res.outcome);
+  const Icon = tone.Icon;
+  const essenziali: [string, string][] = [["Tipologia imballo", i.tipologia], ["Modello / serie", i.modello], ["Settore d'uso", i.settore], ["Capacità", i.capacita]];
 
   return (
-    <div id="report-doc" className="report-paper mx-auto bg-white text-[#1a1a1a] p-[14mm] w-[210mm] max-w-full text-[13px] leading-relaxed font-serif-report">
-      <header className="flex items-start justify-between gap-6 border-b-2 border-[#1a1a1a] pb-3">
-        <div className="flex items-start gap-3">
-          {company.logo && <img src={company.logo} alt="Logo" className="h-14 w-auto object-contain" />}
-          <div className="text-[11px] leading-snug">
-            <div className="text-[15px] font-bold">{company.ragioneSociale || "Ragione sociale non impostata"}</div>
-            {company.indirizzo && <div>{company.indirizzo}</div>}
-            {company.piva && <div>P.IVA/CF: {company.piva}</div>}
-            <div>{[company.telefono, company.email, company.sito].filter(Boolean).join(" · ")}</div>
+    <div id="report-doc" className="report-paper mx-auto bg-white text-[#1a1a1a] px-[12mm] py-[12mm] w-[210mm] max-w-full text-[13px] leading-relaxed font-serif-report">
+      <section className="report-cover page-end flex flex-col">
+        <header className="flex items-start justify-between gap-6 border-b-2 border-[#1a1a1a] pb-3">
+          <div className="flex items-start gap-3">
+            {company.logo && <img src={company.logo} alt="Logo" className="h-14 w-auto object-contain" />}
+            <div className="text-[11px] leading-snug">
+              <div className="text-[15px] font-bold">{company.ragioneSociale || "Ragione sociale non impostata"}</div>
+              {company.indirizzo && <div>{company.indirizzo}</div>}
+              {company.piva && <div>P.IVA/CF: {company.piva}</div>}
+              <div>{[company.telefono, company.email, company.sito].filter(Boolean).join(" · ")}</div>
+            </div>
           </div>
-        </div>
-        <div className="flex items-start gap-3">
-          <div className="text-right text-[11px] font-mono">
-            <div className="font-sans text-[12px] font-extrabold leading-tight text-[#064a25]">PPWR<br />Reusability Hub</div>
-            <div className="mt-1">Rif. Reg. UE 2025/40</div>
-            <div>Data: {fmtDate(ev.updatedAt)}</div>
+          <div className="flex items-start gap-3">
+            <div className="text-right text-[11px] font-mono">
+              <div className="font-sans text-[12px] font-extrabold leading-tight text-[#064a25]">PPWR<br />Reusability Hub</div>
+              <div className="mt-1">Rif. Reg. UE 2025/40</div>
+              <div>Data: {fmtDate(ev.updatedAt)}</div>
+            </div>
+            <img src={hubLogo} alt="Logo PPWR Reusability Hub" className="h-14 w-auto object-contain" />
           </div>
-          <img src={hubLogo} alt="Logo PPWR Reusability Hub" className="h-14 w-auto object-contain" />
+        </header>
+
+        <div className="mt-12">
+          <div className="font-sans text-[12px] font-bold uppercase tracking-[0.2em] text-[#064a25]">Relazione di valutazione</div>
+          <h1 className="mt-2 text-[30px] font-bold leading-tight">Valutazione della riutilizzabilità dell'imballaggio</h1>
+          <div className="mt-3 line-clamp-2 break-words text-[22px] font-semibold leading-snug">{ev.title}</div>
+          <div className="mt-2 font-sans text-[13px] text-[#333]">Regolamento (UE) 2025/40 · Art. 11 e Allegato VI, Parte B</div>
         </div>
-      </header>
 
-      <h1 className="mt-6 text-[20px] font-bold leading-tight">Valutazione della riutilizzabilità dell'imballaggio</h1>
-      <div className="text-[15px] font-semibold">{ev.title}</div>
+        <dl className="mt-10 grid grid-cols-2 gap-x-10 gap-y-6 border-t-2 border-[#1a1a1a] pt-6">
+          {essenziali.map(([k, v]) => (
+            <div key={k}>
+              <dt className="font-sans text-[12px] font-bold uppercase tracking-[0.15em] text-[#333]">{k}</dt>
+              <dd className="mt-1 line-clamp-2 break-words text-[19px] font-semibold leading-snug">{v || "—"}</dd>
+            </div>
+          ))}
+        </dl>
 
-      <h2 className="mt-5 mb-1 text-[14px] font-bold uppercase tracking-wide">Introduzione e inquadramento normativo</h2>
+        <div className="mt-auto">
+          <div className="font-sans text-[12px] font-bold uppercase tracking-[0.2em] text-[#064a25]">Risultato della valutazione</div>
+          <div className={`mt-2 flex items-center gap-5 rounded-md border-2 ${tone.border} p-4`}>
+            <div className={`grid h-16 w-16 shrink-0 place-items-center rounded-full ${tone.iconBg}`}><Icon className="h-10 w-10" strokeWidth={3.5} aria-hidden /></div>
+            <div>
+              <div className="font-sans text-[30px] font-extrabold leading-none">ESITO: {res.outcome}</div>
+              <div className="mt-2 font-sans text-[14px]">{outcomeText(res.outcome, res.vuoti)}</div>
+            </div>
+          </div>
+          <div className="mt-6"><ConformityBar score={res.score} outcome={res.outcome} big /></div>
+        </div>
+      </section>
+
+      <div className="report-body">
+        <div className="mb-4 border-b border-[#999] pb-1 font-sans text-[11px] text-[#333]">Valutazione della riutilizzabilità · <span className="font-semibold">{ev.title}</span></div>
+
+      <h2 className="mb-1 text-[14px] font-bold uppercase tracking-wide">Introduzione e inquadramento normativo</h2>
       <Editable editable={editable} value={ev.report.introduzione || defaultIntro(ev)} onChange={(v) => setRep("introduzione", v)} />
 
       <h2 className="mt-5 mb-2 text-[14px] font-bold uppercase tracking-wide">Dati dell'imballaggio</h2>
@@ -128,9 +204,20 @@ export function Report({ ev, company, editable, onChange }: { ev: Evaluation; co
 
       <div style={{ breakInside: "avoid" }}>
         <h2 className="mt-6 mb-2 text-[14px] font-bold uppercase tracking-wide">5. Esito e conclusioni</h2>
-        <div className={`mb-3 flex items-center justify-between border-2 ${tone} px-4 py-2`}>
-          <span className="text-[16px] font-bold">ESITO: {res.outcome}</span>
-          <span className="font-mono text-[11px] text-[#1a1a1a]">SÌ {res.si} · NO {res.no} · N/A {res.na} · da compilare {res.vuoti} · conformità {res.score}%</span>
+        <div className={`mb-4 rounded-md border-2 ${tone.border} p-5`}>
+          <div className="flex items-center gap-4">
+            <div className={`grid h-14 w-14 shrink-0 place-items-center rounded-full ${tone.iconBg}`}><Icon className="h-9 w-9" strokeWidth={3.5} aria-hidden /></div>
+            <div className="font-sans text-[26px] font-extrabold leading-tight">ESITO: {res.outcome}</div>
+          </div>
+          <div className="mt-4 grid grid-cols-4 gap-3 font-sans">
+            {([["SÌ", res.si], ["NO", res.no], ["N/A", res.na], ["Da compilare", res.vuoti]] as [string, number][]).map(([k, v]) => (
+              <div key={k} className="rounded border-2 border-[#1a1a1a] px-2 py-2 text-center">
+                <div className={`text-[26px] font-extrabold leading-none ${k === "NO" && v > 0 ? "text-destructive" : ""}`}>{v}</div>
+                <div className="mt-1 text-[11px] font-bold uppercase tracking-wider">{k}</div>
+              </div>
+            ))}
+          </div>
+          <div className="mt-5"><ConformityBar score={res.score} outcome={res.outcome} /></div>
         </div>
         <Editable editable={editable} value={ev.report.conclusioni || defaultConclusion(ev)} onChange={(v) => setRep("conclusioni", v)} />
       </div>
@@ -147,6 +234,7 @@ export function Report({ ev, company, editable, onChange }: { ev: Evaluation; co
           <div>{company.ruolo || "Responsabile Tecnico"}</div>
           <div className="mt-10 border-t border-[#1a1a1a] pt-1 font-semibold">{company.responsabile || "\u00a0"}</div>
         </div>
+      </div>
       </div>
     </div>
   );
