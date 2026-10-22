@@ -33,3 +33,9 @@ describe("regole PPWR", () => {
     if (r.ok) expect(Object.keys(r.evaluation.sistema)).toHaveLength(SISTEMA.length);
   });
 });
+
+import { buildFileName as _bfn } from "@/lib/ppwr";
+import { test as _t, expect as _e } from "vitest";
+_t("nome file usa RIUTILIZZO-PPWR", () => {
+  _e(_bfn("IBC PLI 1000L", "pdf", new Date(2026, 9, 7, 21, 7))).toBe("202610072107-RIUTILIZZO-PPWR-IBC_PLI_1000L.pdf");
+});

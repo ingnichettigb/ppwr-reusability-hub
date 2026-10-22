@@ -150,7 +150,7 @@ export function buildFileName(title: string, ext: "pdf" | "json", d = new Date()
     .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
     .replace(/[^A-Za-z0-9_-]+/g, "_")
     .slice(0, 20).replace(/^_+|_+$/g, "") || "SENZA_TITOLO";
-  return `${stamp}-RIUTILIZZO-${clean}.${ext}`;
+  return `${stamp}-RIUTILIZZO-PPWR-${clean}.${ext}`;
 }
 
 // ---------- Storage ----------
