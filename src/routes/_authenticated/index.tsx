@@ -2,8 +2,8 @@
  *  TITOLO FILE      : index.tsx - Pagina principale dell'applicazione
  *  PERCORSO         : src/routes/_authenticated/index.tsx
  *  PROGETTO         : ppwr-reusability-hub (PPWR Reusability Hub)
- *  REVISIONE        : 03
- *  DATA E ORA REV.  : 2026-10-23 20:39 (ora italiana)
+ *  REVISIONE        : 04
+ *  DATA E ORA REV.  : 2026-10-23 20:49 (ora italiana)
  * ------------------------------------------------------------------------------
  *  DESCRIZIONE
  *    Pagina principale: elenco valutazioni, editor, impostazioni ditta, anteprima report,
@@ -12,6 +12,7 @@
  *    controllo prima della generazione, credito scalato solo a PDF riuscito.
  * ------------------------------------------------------------------------------
  *  STORICO REVISIONI (dalla più recente)
+ *    Rev. 04 | 2026-10-23 20:49 | TopBar: aggiunto il pulsante «i» con la guida in-app in 4 lingue (GuidaApp).
  *    Rev. 03 | 2026-10-23 20:39 | Percorso aggiornato (pagina spostata sotto _authenticated). Quota export PDF:
  *                                  downloadPdf restituisce true/false; wrapper exportPdf (canExport prima,
  *                                  consume a PDF riuscito) usato da "Scarica PDF" e dall'icona "Stampa / PDF"
@@ -34,6 +35,7 @@ import {
 } from "@/lib/ppwr";
 import { Report } from "@/components/ppwr/Report";
 import { ControlliSessione } from "@/components/ControlliSessione";
+import { GuidaApp } from "@/components/GuidaApp";
 import { FN060_ExportCountBadge } from "@/moduli/accesso-controllato/esportazione/ExportCountBadge";
 import { useExportQuota } from "@/moduli/accesso-controllato/esportazione/useExportQuota";
 
@@ -221,6 +223,7 @@ function TopBar({ onHome, onSettings, company }: { onHome: () => void; onSetting
         <div className="flex flex-wrap items-center justify-end gap-3">
           {company.ragioneSociale && <span className="hidden text-sm text-muted-foreground sm:block">{company.ragioneSociale}</span>}
           <button className={btnGhost} onClick={onSettings}><Building2 className="h-4 w-4" /> Impostazioni generali ditta</button>
+          <GuidaApp />
           <ControlliSessione />
         </div>
       </div>
