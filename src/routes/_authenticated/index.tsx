@@ -1,15 +1,23 @@
 /* ==============================================================================
  *  TITOLO FILE      : index.tsx - Pagina principale dell'applicazione
- *  PERCORSO         : src/routes/index.tsx
+ *  PERCORSO         : src/routes/_authenticated/index.tsx
  *  PROGETTO         : ppwr-reusability-hub (PPWR Reusability Hub)
- *  REVISIONE        : 02
- *  DATA E ORA REV.  : 2026-10-22 21:02 (ora italiana)
+ *  REVISIONE        : 03
+ *  DATA E ORA REV.  : 2026-10-23 20:39 (ora italiana)
  * ------------------------------------------------------------------------------
  *  DESCRIZIONE
  *    Pagina principale: elenco valutazioni, editor, impostazioni ditta, anteprima report,
  *    stampa e generazione del PDF (funzione downloadPdf).
+ *    Quota export PDF per PUK (badge, avviso ultima esportazione, dialog "Generazioni esaurite"):
+ *    controllo prima della generazione, credito scalato solo a PDF riuscito.
  * ------------------------------------------------------------------------------
  *  STORICO REVISIONI (dalla più recente)
+ *    Rev. 03 | 2026-10-23 20:39 | Percorso aggiornato (pagina spostata sotto _authenticated). Quota export PDF:
+ *                                  downloadPdf restituisce true/false; wrapper exportPdf (canExport prima,
+ *                                  consume a PDF riuscito) usato da "Scarica PDF" e dall'icona "Stampa / PDF"
+ *                                  dell'elenco; "Stampa" bloccata a quota esaurita senza scalare crediti;
+ *                                  badge FN060 nel pulsante e avviso giallo ultima esportazione.
+ *                                  TopBar: email utente, lingua e pulsanti Chiudi/Esci/Esci e cancella tutto.
  *    Rev. 02 | 2026-10-22 21:02 | Intestazione del file riscritta in formato standard (nessuna modifica al codice).
  *    Rev. 01 | 2026-10-22 20:38 | downloadPdf: margini di 12 mm su tutte le pagine e salto pagina forzato
  *                                  dopo la prima pagina del report (elementi con classe "page-end").
@@ -18,13 +26,16 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { toast } from "sonner";
 import {
-  Building2, Copy, Eye, FileDown, FileJson, LogOut, Pencil, Plus, Printer, Save, Trash2, Upload, FileText, Recycle, ArrowLeft,
+  Building2, Copy, Eye, FileDown, FileJson, LogOut, Pencil, Plus, Printer, Save, Trash2, Upload, FileText, Recycle, ArrowLeft, TriangleAlert,
 } from "lucide-react";
 import {
   ALL6B, ART11, SISTEMA, TIPI_SISTEMA, rotationIndex, SETTORI, TIPOLOGIE, buildFileName, computeOutcome, exportJson, fmtDate, loadCompany, loadEvaluations,
   newEvaluation, saveCompany, saveEvaluations, validateImport, type CheckItem, type Company, type Esito, type Evaluation, type Outcome,
 } from "@/lib/ppwr";
 import { Report } from "@/components/ppwr/Report";
+import { ControlliSessione } from "@/components/ControlliSessione";
+import { FN060_ExportCountBadge } from "@/moduli/accesso-controllato/esportazione/ExportCountBadge";
+import { useExportQuota } from "@/moduli/accesso-controllato/esportazione/useExportQuota";
 
 export const Route = createFileRoute("/_authenticated/")({
   head: () => ({
@@ -52,9 +63,10 @@ function OutcomeBadge({ o }: { o: Outcome }) {
   return <span className={`inline-block rounded px-2 py-0.5 font-mono text-[11px] font-bold tracking-wider ${cls}`}>{o}</span>;
 }
 
-async function downloadPdf(ev: Evaluation) {
+// Restituisce true solo se il PDF è stato generato e salvato (serve a scalare il credito a PDF riuscito).
+async function downloadPdf(ev: Evaluation): Promise<boolean> {
   const el = document.getElementById("report-doc");
-  if (!el) return;
+  if (!el) return false;
   const [{ default: html2canvas }, { jsPDF }] = await Promise.all([import("html2canvas-pro"), import("jspdf")]);
   el.classList.add("pdf-mode");
   try {
@@ -91,9 +103,11 @@ async function downloadPdf(ev: Evaluation) {
       first = false; y = end;
     }
     pdf.save(buildFileName(ev.title, "pdf"));
+    return true;
   } catch (err) {
     console.error(err);
-    toast.error("Impossibile generare il PDF. Prova con Stampa → Salva come PDF.");
+    toast.error("Impossibile generare il PDF. Riprova.");
+    return false;
   } finally { el.classList.remove("pdf-mode"); }
 }
 
@@ -109,6 +123,22 @@ function App() {
   const [company, setCompany] = useState<Company>(loadCompanySafe);
   const [view, setView] = useState<View>({ kind: "list" });
   const [pendingPrint, setPendingPrint] = useState<null | "print" | "pdf">(null);
+  const { remaining, showLastExportWarning, canExport, consume, dialog } = useExportQuota();
+
+  // Controllo quota PRIMA, consumo del credito SOLO a PDF riuscito.
+  const exportPdf = async (ev: Evaluation) => {
+    if (!(await canExport())) return false;
+    const ok = await downloadPdf(ev);
+    if (ok) await consume();
+    return ok;
+  };
+  // "Stampa" è bloccata a quota esaurita ma non scala crediti.
+  const guardedPrint = async (ev: Evaluation) => {
+    if (!(await canExport())) return;
+    printReport(ev);
+  };
+  const actions = useRef({ exportPdf, guardedPrint });
+  actions.current = { exportPdf, guardedPrint };
 
   useEffect(() => { setList(loadEvaluations()); setCompany(loadCompany()); }, []);
 
@@ -122,7 +152,11 @@ function App() {
   // print/pdf from list: open report then trigger
   useEffect(() => {
     if (!pendingPrint || view.kind !== "report") return;
-    const t = setTimeout(() => { pendingPrint === "print" ? printReport(view.ev) : downloadPdf(view.ev); setPendingPrint(null); }, 300);
+    const t = setTimeout(() => {
+      if (pendingPrint === "print") void actions.current.guardedPrint(view.ev);
+      else void actions.current.exportPdf(view.ev);
+      setPendingPrint(null);
+    }, 300);
     return () => clearTimeout(t);
   }, [pendingPrint, view]);
 
@@ -153,6 +187,8 @@ function App() {
         {view.kind === "report" && (
           <ReportView
             ev={view.ev} company={company}
+            remaining={remaining} showLastExportWarning={showLastExportWarning}
+            onPrint={guardedPrint} onExportPdf={exportPdf}
             onChange={(ev) => setView({ ...view, ev })}
             onBack={() => setView(view.from === "edit" ? { kind: "edit", ev: view.ev } : { kind: "list" })}
             onSave={() => { const s = persist(view.ev); setView({ ...view, ev: s }); toast.success("Report salvato"); }}
@@ -162,6 +198,7 @@ function App() {
           <Settings initial={company} onSave={(c) => { setCompany(c); saveCompany(c); toast.success("Impostazioni ditta salvate"); setView({ kind: "list" }); }} onExit={() => setView({ kind: "list" })} />
         )}
       </main>
+      {dialog}
     </div>
   );
 }
@@ -173,7 +210,7 @@ function loadCompanySafe(): Company {
 function TopBar({ onHome, onSettings, company }: { onHome: () => void; onSettings: () => void; company: Company }) {
   return (
     <header className="no-print border-b border-border bg-card">
-      <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
+      <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-4 py-3">
         <button onClick={onHome} className="flex items-center gap-3 text-left">
           <span className="grid h-9 w-9 place-items-center rounded-md bg-primary text-primary-foreground"><Recycle className="h-5 w-5" /></span>
           <span>
@@ -181,9 +218,10 @@ function TopBar({ onHome, onSettings, company }: { onHome: () => void; onSetting
             <span className="block font-mono text-[11px] text-muted-foreground">Reg. UE 2025/40 · Art. 11 · All. VI-B</span>
           </span>
         </button>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center justify-end gap-3">
           {company.ragioneSociale && <span className="hidden text-sm text-muted-foreground sm:block">{company.ragioneSociale}</span>}
           <button className={btnGhost} onClick={onSettings}><Building2 className="h-4 w-4" /> Impostazioni generali ditta</button>
+          <ControlliSessione />
         </div>
       </div>
     </header>
@@ -411,7 +449,7 @@ function Editor({ initial, onSave, onExit, onPreview }: { initial: Evaluation; o
   );
 }
 
-function ReportView({ ev, company, onChange, onBack, onSave }: { ev: Evaluation; company: Company; onChange: (e: Evaluation) => void; onBack: () => void; onSave: () => void }) {
+function ReportView({ ev, company, remaining, showLastExportWarning, onPrint, onExportPdf, onChange, onBack, onSave }: { ev: Evaluation; company: Company; remaining: number | null; showLastExportWarning: boolean; onPrint: (e: Evaluation) => Promise<void>; onExportPdf: (e: Evaluation) => Promise<boolean>; onChange: (e: Evaluation) => void; onBack: () => void; onSave: () => void }) {
   const [busy, setBusy] = useState(false);
   return (
     <div>
@@ -420,10 +458,18 @@ function ReportView({ ev, company, onChange, onBack, onSave }: { ev: Evaluation;
         <p className="text-xs text-muted-foreground">I testi tratteggiati sono modificabili direttamente.</p>
         <div className="flex gap-2">
           <button className={btnGhost} onClick={onSave}><Save className="h-4 w-4" /> Salva</button>
-          <button className={btnGhost} onClick={() => printReport(ev)}><Printer className="h-4 w-4" /> Stampa</button>
-          <button className={btnPrimary} disabled={busy} onClick={async () => { setBusy(true); try { await downloadPdf(ev); } finally { setBusy(false); } }}><FileDown className="h-4 w-4" /> {busy ? "Generazione…" : "Scarica PDF"}</button>
+          <button className={btnGhost} onClick={() => void onPrint(ev)}><Printer className="h-4 w-4" /> Stampa</button>
+          <button className={`${btnPrimary} relative`} disabled={busy} onClick={async () => { setBusy(true); try { await onExportPdf(ev); } finally { setBusy(false); } }}>
+            <FileDown className="h-4 w-4" /> {busy ? "Generazione…" : "Scarica PDF"}
+            <FN060_ExportCountBadge count={remaining} />
+          </button>
         </div>
       </div>
+      {showLastExportWarning && (
+        <div role="alert" className="no-print mb-4 flex items-center gap-2 rounded-md border border-yellow-400 bg-yellow-50 px-3 py-2 text-sm text-yellow-900">
+          <TriangleAlert className="h-4 w-4 shrink-0" aria-hidden="true" /> Attenzione: questa è l'ultima esportazione PDF disponibile per il tuo codice PUK.
+        </div>
+      )}
       <div className="report-wrap overflow-x-auto rounded-lg bg-muted p-6">
         <Report ev={ev} company={company} editable onChange={onChange} />
       </div>

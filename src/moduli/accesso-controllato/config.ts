@@ -1,14 +1,16 @@
 // ======================================================================
 // Nome File: config.ts
 // Percorso: src/moduli/accesso-controllato/config.ts
-// Revisione: Rev. 3 (mittente email valorizzato)
-// Data/Ora: 2026-10-06
+// Revisione: Rev. 4 (APP_CODE e APP_NAME valorizzati per 070RiusoPPWR)
+// Data/Ora: 2026-10-23 20:39
+// Progetto: ppwr-reusability-hub (PPWR Reusability Hub)
+// Modifiche Rev. 4: APP_CODE = "070RiusoPPWR", APP_NAME = "PPWR Riutilizzo" (prima segnaposto INSERISCI_QUI_...).
 // ======================================================================
 
 // Configurazione centrale del modulo. Unico file da personalizzare per ogni nuova SaaS.
 
-export const APP_CODE = "INSERISCI_QUI_APP_CODE"; // codice registrato nella tabella licenses del DB centrale (es. "061MiaApp")
-export const APP_NAME = "INSERISCI_QUI_NOME_APP"; // nome mostrato a video, nelle email e nelle condizioni d'uso
+export const APP_CODE = "070RiusoPPWR"; // codice registrato nella tabella licenses del DB centrale
+export const APP_NAME = "PPWR Riutilizzo"; // nome mostrato a video, nelle email e nelle condizioni d'uso
 // Aumentare la versione ogni volta che cambia il testo delle condizioni: obbliga tutti a riaccettarle.
 export const TERMS_VERSION = "v1";
 

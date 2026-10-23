@@ -1,8 +1,10 @@
 // ======================================================================
 // Nome File: licenza.server.ts
 // Percorso: src/moduli/accesso-controllato/server/licenza.server.ts
-// Revisione: Rev. 2 (Consenso vincolato a PUK_CODE ed email utente)
-// Data/Ora: 2026-10-03 21:05
+// Revisione: Rev. 3 (PUK dei piani con suffisso accettati)
+// Data/Ora: 2026-10-23 20:39
+// Progetto: ppwr-reusability-hub (PPWR Reusability Hub)
+// Modifiche Rev. 3: il controllo ERR203 accetta type_product_code uguale ad APP_CODE oppure APP_CODE-suffisso (-002/-030/-365).
 // ======================================================================
 
 // SOLO SERVER. Licenze, PUK, quota export PDF e consenso, sul database esterno condiviso del portfolio.
@@ -114,7 +116,9 @@ export async function FN032_AttivaLicenza(
     .maybeSingle();
   if (errPuk) throw new Error(errPuk.message);
   if (!rigaPuk) return { ok: false, codice: "ERR201" };
-  if (rigaPuk.type_product_code !== APP_CODE) return { ok: false, codice: "ERR203" };
+  // Accetta il codice app ("070RiusoPPWR") e i codici di piano con suffisso ("070RiusoPPWR-002", "-030", "-365").
+  const tipoPuk = String(rigaPuk.type_product_code ?? "");
+  if (tipoPuk !== APP_CODE && !tipoPuk.startsWith(`${APP_CODE}-`)) return { ok: false, codice: "ERR203" };
 
   let licenza = valide.find((l) => l.id === rigaPuk.license_id);
   if (!licenza) {
