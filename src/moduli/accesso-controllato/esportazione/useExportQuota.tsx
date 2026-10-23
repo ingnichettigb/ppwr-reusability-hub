@@ -1,11 +1,14 @@
 // ======================================================================
 // Nome File: useExportQuota.tsx
 // Percorso: src/moduli/accesso-controllato/esportazione/useExportQuota.tsx
-// Revisione: Rev. 1
-// Data/Ora: 2026-10-01 21:45
+// Revisione: Rev. 3 (aggiunto canExport: il credito si scala a PDF riuscito)
+// Data/Ora: 2026-10-23 20:39
+// Progetto: ppwr-reusability-hub (PPWR Reusability Hub)
+// Modifiche Rev. 3: nuova funzione canExport() da chiamare PRIMA di generare il PDF (rilegge il residuo dal server,
+// se esaurito apre il dialog); consume() va ora chiamato DOPO la generazione riuscita, così un errore non brucia il credito.
 // ======================================================================
 
-// Hook della quota export PDF per singolo PUK. consume() va chiamato subito prima di generare il file PDF.
+// Hook della quota export PDF per singolo PUK. canExport() va chiamato prima di generare il PDF, consume() solo a PDF riuscito.
 import { useCallback, useEffect, useRef, useState } from "react";
 import { PUK_ID_KEY } from "../config";
 import { FN004_FormattaErrore } from "../errori";
@@ -38,7 +41,27 @@ export function useExportQuota() {
   }, []);
 
   // ======================================================================
-  // FN059[ConsumaExport]: scala un export PDF sul server (anti doppio clic); restituisce true se si può generare il PDF, false se bloccato.
+  // FN066[PuoEsportare]: rilegge il residuo dal server; se esaurito apre il dialog e restituisce false (fail-open su errore).
+  // ======================================================================
+  const canExport = useCallback(async (): Promise<boolean> => {
+    const pukId = FN008_LeggiChiave(PUK_ID_KEY);
+    if (!pukId) return true;
+    let corrente = remaining;
+    try {
+      corrente = (await FN045_LeggiQuotaPdfFn({ data: { pukId } })).remaining;
+      setRemaining(corrente);
+    } catch {
+      /* fail-open: si usa l'ultimo valore noto */
+    }
+    if (corrente !== null && corrente <= 0) {
+      setDialogAperto(true);
+      return false;
+    }
+    return true;
+  }, [remaining]);
+
+  // ======================================================================
+  // FN059[ConsumaExport]: scala un export PDF sul server (anti doppio clic); da chiamare a PDF già generato con successo.
   // ======================================================================
   const consume = useCallback(async (): Promise<boolean> => {
     if (inVolo.current) return false;
@@ -69,6 +92,7 @@ export function useExportQuota() {
     remaining,
     blocked: remaining !== null && remaining <= 0,
     showLastExportWarning: remaining === 1,
+    canExport,
     consume,
     dialog: (
       <FN061_DialogExportEsauriti aperto={dialogAperto} onChiudi={() => setDialogAperto(false)} />
