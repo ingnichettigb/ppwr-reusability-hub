@@ -2,8 +2,8 @@
  *  TITOLO FILE      : guida-testi.ts - Testi della guida in-app (IT, EN, DE, ES)
  *  PERCORSO         : src/lib/guida-testi.ts
  *  PROGETTO         : ppwr-reusability-hub (PPWR Reusability Hub)
- *  REVISIONE        : 01
- *  DATA E ORA REV.  : 2026-10-23 20:49 (ora italiana)
+ *  REVISIONE        : 02
+ *  DATA E ORA REV.  : 2026-10-23 20:55 (ora italiana)
  * ------------------------------------------------------------------------------
  *  DESCRIZIONE
  *    Testi della guida che si apre dal pulsante «i» nell'intestazione, nelle 4 lingue
@@ -13,6 +13,7 @@
  *    Nota: valutazioni, checklist, report e PDF restano in italiano (testo normativo).
  * ------------------------------------------------------------------------------
  *  STORICO REVISIONI (dalla più recente)
+ *    Rev. 02 | 2026-10-23 20:55 | Note della checklist dichiarate facoltative (anche per N.A.) nelle 4 lingue.
  *    Rev. 01 | 2026-10-23 20:49 | Creazione del file.
  * ============================================================================== */
 import type { Lingua } from "@/lib/i18n";
@@ -83,7 +84,7 @@ export const GUIDA: Record<Lingua, TestiGuida> = {
           "Dati dell'imballo: titolo, tipologia (IBC, fusti, pallet, cassetta, big bag, tanica, cisternetta, altro), modello, materiale, dimensioni, capacità, settore d'uso e descrizione.",
           "Rotazioni previste ed effettuate: l'indice di utilizzo è rotazioni effettuate ÷ rotazioni previste × 100.",
           "Sistema di riutilizzo: tipo (circuito chiuso, aperto/pooling, misto), identificazione e tracciabilità, evidenze documentali.",
-          "Checklist di 23 requisiti in 3 gruppi: Articolo 11 (9), Allegato VI parte B (8), sistema di riutilizzo S1–S6 (6). Per ciascuno scegli SÌ, NO o N.A.; usa le note per le evidenze e, per N.A., per la motivazione tecnica.",
+          "Checklist di 23 requisiti in 3 gruppi: Articolo 11 (9), Allegato VI parte B (8), sistema di riutilizzo S1–S6 (6). Per ciascuno scegli SÌ, NO o N.A. Le note sono facoltative: usale per le evidenze o, se vuoi, per spiegare un N.A.",
         ],
       },
       {
@@ -172,7 +173,7 @@ export const GUIDA: Record<Lingua, TestiGuida> = {
           "Packaging data: title, type (IBC, drums, pallets, crate, big bag, jerrycan, tank, other), model, material, dimensions, capacity, sector of use and description.",
           "Planned and completed rotations: the utilisation index is completed rotations ÷ planned rotations × 100.",
           "Reuse system: type (closed loop, open/pooling, mixed), identification and traceability, supporting documents.",
-          "Checklist of 23 requirements in 3 groups: Article 11 (9), Annex VI part B (8), reuse system S1–S6 (6). For each one choose YES, NO or N/A; use the notes for evidence and, for N/A, for the technical justification.",
+          "Checklist of 23 requirements in 3 groups: Article 11 (9), Annex VI part B (8), reuse system S1–S6 (6). For each one choose YES, NO or N/A. Notes are optional: use them for evidence or, if you wish, to explain an N/A.",
         ],
       },
       {
@@ -261,7 +262,7 @@ export const GUIDA: Record<Lingua, TestiGuida> = {
           "Verpackungsdaten: Titel, Typ (IBC, Fässer, Paletten, Kiste, Big Bag, Kanister, Tank, Sonstiges), Modell, Material, Abmessungen, Fassungsvermögen, Einsatzbereich und Beschreibung.",
           "Geplante und durchgeführte Umläufe: Der Nutzungsindex ist durchgeführte Umläufe ÷ geplante Umläufe × 100.",
           "Wiederverwendungssystem: Art (geschlossener Kreislauf, offener Kreislauf/Pooling, gemischt), Kennzeichnung und Rückverfolgbarkeit, Nachweise.",
-          "Checkliste mit 23 Anforderungen in 3 Gruppen: Artikel 11 (9), Anhang VI Teil B (8), Wiederverwendungssystem S1–S6 (6). Wählen Sie jeweils JA, NEIN oder N.A.; nutzen Sie die Notizen für Nachweise und bei N.A. für die technische Begründung.",
+          "Checkliste mit 23 Anforderungen in 3 Gruppen: Artikel 11 (9), Anhang VI Teil B (8), Wiederverwendungssystem S1–S6 (6). Wählen Sie jeweils JA, NEIN oder N.A. Notizen sind optional: Nutzen Sie sie für Nachweise oder, wenn Sie möchten, um ein N.A. zu erläutern.",
         ],
       },
       {
@@ -350,7 +351,7 @@ export const GUIDA: Record<Lingua, TestiGuida> = {
           "Datos del envase: título, tipo (IBC, bidones, palés, caja, big bag, bidón pequeño, cisterna pequeña, otro), modelo, material, dimensiones, capacidad, sector de uso y descripción.",
           "Rotaciones previstas y realizadas: el índice de utilización es rotaciones realizadas ÷ rotaciones previstas × 100.",
           "Sistema de reutilización: tipo (circuito cerrado, abierto/pooling, mixto), identificación y trazabilidad, evidencias documentales.",
-          "Lista de verificación de 23 requisitos en 3 grupos: Artículo 11 (9), Anexo VI parte B (8), sistema de reutilización S1–S6 (6). Para cada uno elige SÍ, NO o N.A.; usa las notas para las evidencias y, en N.A., para la justificación técnica.",
+          "Lista de verificación de 23 requisitos en 3 grupos: Artículo 11 (9), Anexo VI parte B (8), sistema de reutilización S1–S6 (6). Para cada uno elige SÍ, NO o N.A. Las notas son opcionales: úsalas para las evidencias o, si quieres, para explicar un N.A.",
         ],
       },
       {
