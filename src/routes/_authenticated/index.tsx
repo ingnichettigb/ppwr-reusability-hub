@@ -26,7 +26,7 @@ import {
 } from "@/lib/ppwr";
 import { Report } from "@/components/ppwr/Report";
 
-export const Route = createFileRoute("/")({
+export const Route = createFileRoute("/_authenticated/")({
   head: () => ({
     meta: [
       { title: "PPWR Riutilizzo — Valutazione riutilizzabilità imballaggi (Reg. UE 2025/40)" },
