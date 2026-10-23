@@ -28,7 +28,7 @@ export const OTP_MAX_RICHIESTE = 3;
 export const OTP_FINESTRA_ORE = 24;
 export const OTP_MAX_ERRORI = 5;
 
-export const ROTTA_HOME = "/valutazioni" as const;
+export const ROTTA_HOME = "/" as const;
 
 export const VERIFIED_EMAIL_KEY = `${APP_CODE}:verifiedEmail`;
 export const ACTIVATED_KEY = `${APP_CODE}:activated`;

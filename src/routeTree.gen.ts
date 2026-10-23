@@ -9,50 +9,153 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as AttivazioneRouteImport } from './routes/attivazione'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as CondizioniRouteImport } from './routes/condizioni'
+import { Route as LicenzaScadutaRouteImport } from './routes/licenza-scaduta'
+import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
 
-const IndexRoute = IndexRouteImport.update({
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AttivazioneRoute = AttivazioneRouteImport.update({
+  id: '/attivazione',
+  path: '/attivazione',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CondizioniRoute = CondizioniRouteImport.update({
+  id: '/condizioni',
+  path: '/condizioni',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LicenzaScadutaRoute = LicenzaScadutaRouteImport.update({
+  id: '/licenza-scaduta',
+  path: '/licenza-scaduta',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedIndexRoute = AuthenticatedIndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
+  '/': typeof AuthenticatedIndexRoute
+  '/attivazione': typeof AttivazioneRoute
+  '/auth': typeof AuthRoute
+  '/condizioni': typeof CondizioniRoute
+  '/licenza-scaduta': typeof LicenzaScadutaRoute
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
+  '/attivazione': typeof AttivazioneRoute
+  '/auth': typeof AuthRoute
+  '/condizioni': typeof CondizioniRoute
+  '/licenza-scaduta': typeof LicenzaScadutaRoute
+  '/': typeof AuthenticatedIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/attivazione': typeof AttivazioneRoute
+  '/auth': typeof AuthRoute
+  '/condizioni': typeof CondizioniRoute
+  '/licenza-scaduta': typeof LicenzaScadutaRoute
+  '/_authenticated/': typeof AuthenticatedIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths: '/' | '/attivazione' | '/auth' | '/condizioni' | '/licenza-scaduta'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/attivazione' | '/auth' | '/condizioni' | '/licenza-scaduta' | '/'
+  id:
+    | '__root__'
+    | '/_authenticated'
+    | '/attivazione'
+    | '/auth'
+    | '/condizioni'
+    | '/licenza-scaduta'
+    | '/_authenticated/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
+  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  AttivazioneRoute: typeof AttivazioneRoute
+  AuthRoute: typeof AuthRoute
+  CondizioniRoute: typeof CondizioniRoute
+  LicenzaScadutaRoute: typeof LicenzaScadutaRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/': {
-      id: '/'
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/attivazione': {
+      id: '/attivazione'
+      path: '/attivazione'
+      fullPath: '/attivazione'
+      preLoaderRoute: typeof AttivazioneRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/condizioni': {
+      id: '/condizioni'
+      path: '/condizioni'
+      fullPath: '/condizioni'
+      preLoaderRoute: typeof CondizioniRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/licenza-scaduta': {
+      id: '/licenza-scaduta'
+      path: '/licenza-scaduta'
+      fullPath: '/licenza-scaduta'
+      preLoaderRoute: typeof LicenzaScadutaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/': {
+      id: '/_authenticated/'
       path: '/'
       fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof AuthenticatedIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
   }
 }
 
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
+}
+
+const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedIndexRoute: AuthenticatedIndexRoute,
+}
+
+const AuthenticatedRouteRouteWithChildren =
+  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
+  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  AttivazioneRoute: AttivazioneRoute,
+  AuthRoute: AuthRoute,
+  CondizioniRoute: CondizioniRoute,
+  LicenzaScadutaRoute: LicenzaScadutaRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
