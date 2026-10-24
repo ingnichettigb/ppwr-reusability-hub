@@ -2,20 +2,21 @@
  *  TITOLO FILE      : conferme-testi.ts - Testi delle conferme di uscita e «Torna all'elenco»
  *  PERCORSO         : src/lib/conferme-testi.ts
  *  PROGETTO         : ppwr-reusability-hub (PPWR Reusability Hub)
- *  REVISIONE        : 01
- *  DATA E ORA REV.  : 2026-10-24 15:43 (ora italiana)
+ *  REVISIONE        : 02
+ *  DATA E ORA REV.  : 2026-10-24 20:48 (ora italiana)
  * ------------------------------------------------------------------------------
  *  DESCRIZIONE
- *    Testi (IT, EN, DE, ES) delle finestre di conferma che precedono «Chiudi applicazione»,
+ *    Testi (IT, EN, DE, ES) delle finestre di conferma che precedono
  *    «Esci» ed «Esci e cancella tutto», e dell'etichetta «Torna all'elenco».
  *    Servono a evitare uscite involontarie dal programma.
  * ------------------------------------------------------------------------------
  *  STORICO REVISIONI (dalla più recente)
+ *    Rev. 02 | 2026-10-24 20:48 | Tolta la conferma di «Chiudi applicazione» (pulsante eliminato); aggiunta l'etichetta «Torna alla scheda» (4 lingue).
  *    Rev. 01 | 2026-10-24 15:43 | Creazione del file.
  * ============================================================================== */
 import { useLingua, type Lingua } from "@/lib/i18n";
 
-export type TipoConferma = "chiudi" | "esci" | "cancella";
+export type TipoConferma = "esci" | "cancella";
 
 export interface TestoConferma {
   titolo: string;
@@ -28,6 +29,7 @@ export interface TestoConferma {
 }
 export interface TestiConferme {
   tornaElenco: string;
+  tornaScheda: string;
   etichettaSuccede: string;
   etichettaResta: string;
   voci: Record<TipoConferma, TestoConferma>;
@@ -36,6 +38,7 @@ export interface TestiConferme {
 export const CONFERME: Record<Lingua, TestiConferme> = {
   it: {
     tornaElenco: "Torna all'elenco",
+    tornaScheda: "Torna alla scheda",
     etichettaSuccede: "Cosa succede",
     etichettaResta: "Cosa resta salvato",
     voci: {
@@ -66,24 +69,11 @@ export const CONFERME: Record<Lingua, TestiConferme> = {
         annulla: "Annulla",
         conferma: "Sì, esci e cancella",
       },
-      chiudi: {
-        titolo: "Vuoi chiudere l'applicazione?",
-        intro: "Attenzione: «Chiudi applicazione» non significa «Torna indietro». Ti scollega e chiude il programma.",
-        succede: [
-          "Verrai scollegato.",
-          "Il programma proverà a chiudere questa scheda del browser; se il browser non lo permette, tornerai alla schermata di accesso.",
-          "Alla prossima apertura ti servirà un nuovo codice, che ti arriverà via email.",
-          "Le modifiche non salvate della scheda aperta andranno perse.",
-        ],
-        resta: ["Licenza e PUK restano su questo computer.", "Le valutazioni e i dati della ditta restano salvati."],
-        suggerimento: "Volevi solo tornare all'elenco delle valutazioni? Premi «Annulla» e usa il pulsante «Torna all'elenco».",
-        annulla: "Annulla",
-        conferma: "Sì, chiudi l'applicazione",
-      },
     },
   },
   en: {
     tornaElenco: "Back to the list",
+    tornaScheda: "Back to the form",
     etichettaSuccede: "What happens",
     etichettaResta: "What stays saved",
     voci: {
@@ -114,24 +104,11 @@ export const CONFERME: Record<Lingua, TestiConferme> = {
         annulla: "Cancel",
         conferma: "Yes, sign out and erase",
       },
-      chiudi: {
-        titolo: "Do you want to close the application?",
-        intro: "Careful: «Close application» does not mean «Go back». It signs you out and closes the program.",
-        succede: [
-          "You will be signed out.",
-          "The program will try to close this browser tab; if the browser does not allow it, you will return to the sign-in screen.",
-          "Next time you open it you will need a new code, which will be sent to you by email.",
-          "Unsaved changes in the open form will be lost.",
-        ],
-        resta: ["Licence and PUK stay on this computer.", "Assessments and company data stay saved."],
-        suggerimento: "Did you only want to go back to the list of assessments? Press «Cancel» and use the «Back to the list» button.",
-        annulla: "Cancel",
-        conferma: "Yes, close the application",
-      },
     },
   },
   de: {
     tornaElenco: "Zurück zur Liste",
+    tornaScheda: "Zurück zum Bogen",
     etichettaSuccede: "Was passiert",
     etichettaResta: "Was gespeichert bleibt",
     voci: {
@@ -162,24 +139,11 @@ export const CONFERME: Record<Lingua, TestiConferme> = {
         annulla: "Abbrechen",
         conferma: "Ja, abmelden und löschen",
       },
-      chiudi: {
-        titolo: "Möchten Sie die Anwendung schließen?",
-        intro: "Achtung: «Anwendung schließen» bedeutet nicht «Zurück». Sie werden abgemeldet und das Programm wird geschlossen.",
-        succede: [
-          "Sie werden abgemeldet.",
-          "Das Programm versucht, diesen Browser-Tab zu schließen; erlaubt der Browser das nicht, kehren Sie zur Anmeldeseite zurück.",
-          "Beim nächsten Öffnen benötigen Sie einen neuen Code, den Sie per E-Mail erhalten.",
-          "Nicht gespeicherte Änderungen im geöffneten Bogen gehen verloren.",
-        ],
-        resta: ["Lizenz und PUK bleiben auf diesem Computer.", "Bewertungen und Firmendaten bleiben gespeichert."],
-        suggerimento: "Wollten Sie nur zur Liste der Bewertungen zurück? Drücken Sie «Abbrechen» und verwenden Sie die Schaltfläche «Zurück zur Liste».",
-        annulla: "Abbrechen",
-        conferma: "Ja, Anwendung schließen",
-      },
     },
   },
   es: {
     tornaElenco: "Volver a la lista",
+    tornaScheda: "Volver a la ficha",
     etichettaSuccede: "Qué ocurre",
     etichettaResta: "Qué queda guardado",
     voci: {
@@ -210,20 +174,6 @@ export const CONFERME: Record<Lingua, TestiConferme> = {
         annulla: "Cancelar",
         conferma: "Sí, salir y borrar",
       },
-      chiudi: {
-        titolo: "¿Quieres cerrar la aplicación?",
-        intro: "Atención: «Cerrar aplicación» no significa «Volver atrás». Cierra tu sesión y cierra el programa.",
-        succede: [
-          "Se cerrará tu sesión.",
-          "El programa intentará cerrar esta pestaña del navegador; si el navegador no lo permite, volverás a la pantalla de acceso.",
-          "La próxima vez que lo abras necesitarás un nuevo código, que recibirás por correo.",
-          "Se perderán los cambios no guardados de la ficha abierta.",
-        ],
-        resta: ["La licencia y el PUK permanecen en este ordenador.", "Las evaluaciones y los datos de la empresa siguen guardados."],
-        suggerimento: "¿Solo querías volver a la lista de evaluaciones? Pulsa «Cancelar» y usa el botón «Volver a la lista».",
-        annulla: "Cancelar",
-        conferma: "Sí, cerrar la aplicación",
-      },
     },
   },
 };
@@ -237,4 +187,9 @@ export function useConferme(): TestiConferme {
 /** Etichetta «Torna all'elenco» nella lingua scelta. */
 export function useTornaElenco(): string {
   return useConferme().tornaElenco;
+}
+
+/** Etichetta «Torna alla scheda» (dal report alla scheda di valutazione) nella lingua scelta. */
+export function useTornaScheda(): string {
+  return useConferme().tornaScheda;
 }
