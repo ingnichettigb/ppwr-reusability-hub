@@ -2,8 +2,8 @@
  *  TITOLO FILE      : conferme-testi.ts - Testi delle conferme di uscita e «Torna all'elenco»
  *  PERCORSO         : src/lib/conferme-testi.ts
  *  PROGETTO         : ppwr-reusability-hub (PPWR Reusability Hub)
- *  REVISIONE        : 02
- *  DATA E ORA REV.  : 2026-10-24 20:48 (ora italiana)
+ *  REVISIONE        : 03
+ *  DATA E ORA REV.  : 2026-10-24 21:04 (ora italiana)
  * ------------------------------------------------------------------------------
  *  DESCRIZIONE
  *    Testi (IT, EN, DE, ES) delle finestre di conferma che precedono
@@ -11,6 +11,7 @@
  *    Servono a evitare uscite involontarie dal programma.
  * ------------------------------------------------------------------------------
  *  STORICO REVISIONI (dalla più recente)
+ *    Rev. 03 | 2026-10-24 21:04 | Testi spagnoli allineati al pulsante «Cerrar sesión» (prima «Salir»).
  *    Rev. 02 | 2026-10-24 20:48 | Tolta la conferma di «Chiudi applicazione» (pulsante eliminato); aggiunta l'etichetta «Torna alla scheda» (4 lingue).
  *    Rev. 01 | 2026-10-24 15:43 | Creazione del file.
  * ============================================================================== */
@@ -149,7 +150,7 @@ export const CONFERME: Record<Lingua, TestiConferme> = {
     voci: {
       esci: {
         titolo: "¿Quieres salir del programa?",
-        intro: "Atención: «Salir» no significa «Volver atrás». Te desconecta del programa.",
+        intro: "Atención: «Cerrar sesión» no significa «Volver atrás». Te desconecta del programa.",
         succede: [
           "Se cerrará tu sesión y pasarás a la pantalla de acceso.",
           "Para volver a entrar tendrás que pedir un nuevo código, que recibirás por correo.",
@@ -158,7 +159,7 @@ export const CONFERME: Record<Lingua, TestiConferme> = {
         resta: ["La licencia y el PUK permanecen en este ordenador.", "Las evaluaciones y los datos de la empresa siguen guardados."],
         suggerimento: "¿Solo querías volver a la lista de evaluaciones? Pulsa «Cancelar» y usa el botón «Volver a la lista».",
         annulla: "Cancelar",
-        conferma: "Sí, salir",
+        conferma: "Sí, cerrar sesión",
       },
       cancella: {
         titolo: "¿Quieres salir y borrar los datos de acceso?",

@@ -1,19 +1,20 @@
 /* ==============================================================================
- *  TITOLO FILE      : ControlliSessione.tsx - Selettore lingua e menu Account
+ *  TITOLO FILE      : ControlliSessione.tsx - Selettore lingua e pulsante «Esci ▾»
  *  PERCORSO         : src/components/ControlliSessione.tsx
  *  PROGETTO         : ppwr-reusability-hub (PPWR Reusability Hub)
- *  REVISIONE        : 03
- *  DATA E ORA REV.  : 2026-10-24 20:48 (ora italiana)
+ *  REVISIONE        : 04
+ *  DATA E ORA REV.  : 2026-10-24 21:04 (ora italiana)
  * ------------------------------------------------------------------------------
  *  DESCRIZIONE
- *    Blocco dell'intestazione: selettore lingua (IT, EN, DE, ES) e menu «Account»
- *    (email dell'utente connesso con freccia) che contiene "Esci" ed "Esci e cancella tutto".
+ *    Blocco dell'intestazione: selettore lingua (IT, EN, DE, ES) e pulsante «Esci ▾»
+ *    che apre un menu con l'email dell'utente connesso, "Esci" ed "Esci e cancella tutto".
  *    I testi vengono dal dizionario del modulo accesso-controllato (chiavi usc.*), come da kit.
  *    - Esci: logout mantenendo licenza e PUK sul dispositivo.
  *    - Esci e cancella tutto: logout e cancellazione di email, licenza, PUK e consenso locali
  *      (FN016_EsciECancellaTutto). Gli archivi dati dell'app (ppwr.*) non vengono toccati.
  * ------------------------------------------------------------------------------
  *  STORICO REVISIONI (dalla più recente)
+ *    Rev. 04 | 2026-10-24 21:04 | Il menu si apre da un pulsante «Esci ▾» ben riconoscibile; l'email passa dentro il menu (in alto).
  *    Rev. 03 | 2026-10-24 20:48 | Menu «Account» (email con freccia) con «Esci» ed «Esci e cancella tutto»; eliminato «Chiudi applicazione». Intestazione su una riga.
  *    Rev. 02 | 2026-10-24 15:43 | Conferma molto chiara prima di «Chiudi applicazione», «Esci» ed «Esci e cancella tutto»
  *                                  (cosa succede, cosa resta salvato, suggerimento «Torna all'elenco»), in 4 lingue.
@@ -22,7 +23,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
-import { ChevronDown, TriangleAlert, User } from "lucide-react";
+import { ChevronDown, LogOut, TriangleAlert, User } from "lucide-react";
 
 import { supabase } from "@/integrations/supabase/client";
 import { SelettoreLingua } from "@/components/SelettoreLingua";
@@ -82,17 +83,24 @@ export function ControlliSessione() {
         <DropdownMenuTrigger asChild>
           <button
             type="button"
-            aria-label={emailUtente ?? "Account"}
-            title={emailUtente ?? "Account"}
-            className="flex items-center gap-1.5 rounded-md border border-border bg-card px-2.5 py-1.5 font-mono text-[12px] text-foreground transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            title={emailUtente ?? undefined}
+            className="inline-flex items-center gap-1.5 rounded-md border border-border bg-card px-3 py-1.5 text-[13px] font-medium text-foreground transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
-            <User className="h-3.5 w-3.5 text-primary" aria-hidden="true" />
-            <span className="max-w-[120px] truncate sm:max-w-[220px]">{emailUtente ?? "Account"}</span>
+            <LogOut className="h-4 w-4" aria-hidden="true" />
+            {ta("usc.esci")}
             <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" aria-hidden="true" />
           </button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="min-w-60">
-          {emailUtente && <DropdownMenuLabel className="truncate font-mono text-xs font-normal text-muted-foreground">{emailUtente}</DropdownMenuLabel>}
+          {emailUtente && (
+            <>
+              <DropdownMenuLabel className="flex items-center gap-2 font-mono text-xs font-normal text-muted-foreground">
+                <User className="h-3.5 w-3.5 shrink-0 text-primary" aria-hidden="true" />
+                <span className="truncate">{emailUtente}</span>
+              </DropdownMenuLabel>
+              <DropdownMenuSeparator />
+            </>
+          )}
           <DropdownMenuItem onSelect={() => chiedi("esci")}>{ta("usc.esci")}</DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem className="text-destructive focus:text-destructive" onSelect={() => chiedi("cancella")}>
