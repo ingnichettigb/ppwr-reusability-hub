@@ -2,8 +2,8 @@
  *  TITOLO FILE      : index.tsx - Pagina principale dell'applicazione
  *  PERCORSO         : src/routes/_authenticated/index.tsx
  *  PROGETTO         : ppwr-reusability-hub (PPWR Reusability Hub)
- *  REVISIONE        : 05
- *  DATA E ORA REV.  : 2026-10-24 15:43 (ora italiana)
+ *  REVISIONE        : 06
+ *  DATA E ORA REV.  : 2026-10-24 20:49 (ora italiana)
  * ------------------------------------------------------------------------------
  *  DESCRIZIONE
  *    Pagina principale: elenco valutazioni, editor, impostazioni ditta, anteprima report,
@@ -12,6 +12,7 @@
  *    controllo prima della generazione, credito scalato solo a PDF riuscito.
  * ------------------------------------------------------------------------------
  *  STORICO REVISIONI (dalla più recente)
+ *    Rev. 06 | 2026-10-24 20:49 | Intestazione su una riga e menu «Account» (ControlliSessione); eliminato «Chiudi applicazione»; nel report «Indietro» diventa «Torna alla scheda» (solo se si arriva dalla scheda; dall'elenco c'è già «Torna all'elenco» in alto).
  *    Rev. 05 | 2026-10-24 15:43 | Logo dell'app al posto dell'icona del riciclo; pulsante «Torna all'elenco» sempre visibile
  *                                  fuori dall'elenco (con avviso se ci sono modifiche non salvate); il «Esci» di editor e
  *                                  impostazioni diventa «Torna all'elenco» (non è più confondibile con il logout).
@@ -40,7 +41,7 @@ import { Report } from "@/components/ppwr/Report";
 import { ControlliSessione } from "@/components/ControlliSessione";
 import { GuidaApp } from "@/components/GuidaApp";
 import logoApp from "@/assets/logo-ppwr-app.png";
-import { useTornaElenco } from "@/lib/conferme-testi";
+import { useTornaElenco, useTornaScheda } from "@/lib/conferme-testi";
 import { FN060_ExportCountBadge } from "@/moduli/accesso-controllato/esportazione/ExportCountBadge";
 import { useExportQuota } from "@/moduli/accesso-controllato/esportazione/useExportQuota";
 
@@ -203,7 +204,7 @@ function App() {
         {view.kind === "report" && (
           <ReportView
             ev={view.ev} company={company}
-            remaining={remaining} showLastExportWarning={showLastExportWarning}
+            from={view.from} remaining={remaining} showLastExportWarning={showLastExportWarning}
             onPrint={guardedPrint} onExportPdf={exportPdf}
             onChange={(ev) => setView({ ...view, ev })}
             onBack={() => setView(view.from === "edit" ? { kind: "edit", ev: view.ev } : { kind: "list" })}
@@ -470,12 +471,13 @@ function Editor({ initial, onSave, onExit, onPreview, onDirtyChange }: { initial
   );
 }
 
-function ReportView({ ev, company, remaining, showLastExportWarning, onPrint, onExportPdf, onChange, onBack, onSave }: { ev: Evaluation; company: Company; remaining: number | null; showLastExportWarning: boolean; onPrint: (e: Evaluation) => Promise<void>; onExportPdf: (e: Evaluation) => Promise<boolean>; onChange: (e: Evaluation) => void; onBack: () => void; onSave: () => void }) {
+function ReportView({ ev, company, from, remaining, showLastExportWarning, onPrint, onExportPdf, onChange, onBack, onSave }: { ev: Evaluation; company: Company; from: "list" | "edit"; remaining: number | null; showLastExportWarning: boolean; onPrint: (e: Evaluation) => Promise<void>; onExportPdf: (e: Evaluation) => Promise<boolean>; onChange: (e: Evaluation) => void; onBack: () => void; onSave: () => void }) {
   const [busy, setBusy] = useState(false);
+  const tornaScheda = useTornaScheda();
   return (
     <div>
       <div className="no-print mb-4 flex flex-wrap items-center justify-between gap-2">
-        <button className={btnGhost} onClick={onBack}><ArrowLeft className="h-4 w-4" /> Indietro</button>
+        {from === "edit" ? <button className={btnGhost} onClick={onBack}><ArrowLeft className="h-4 w-4" /> {tornaScheda}</button> : <span />}
         <p className="text-xs text-muted-foreground">I testi tratteggiati sono modificabili direttamente.</p>
         <div className="flex gap-2">
           <button className={btnGhost} onClick={onSave}><Save className="h-4 w-4" /> Salva</button>

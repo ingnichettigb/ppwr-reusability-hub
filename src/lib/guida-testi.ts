@@ -2,8 +2,8 @@
  *  TITOLO FILE      : guida-testi.ts - Testi della guida in-app (IT, EN, DE, ES)
  *  PERCORSO         : src/lib/guida-testi.ts
  *  PROGETTO         : ppwr-reusability-hub (PPWR Reusability Hub)
- *  REVISIONE        : 03
- *  DATA E ORA REV.  : 2026-10-24 15:43 (ora italiana)
+ *  REVISIONE        : 04
+ *  DATA E ORA REV.  : 2026-10-24 20:49 (ora italiana)
  * ------------------------------------------------------------------------------
  *  DESCRIZIONE
  *    Testi della guida che si apre dal pulsante «i» nell'intestazione, nelle 4 lingue
@@ -13,6 +13,7 @@
  *    Nota: valutazioni, checklist, report e PDF restano in italiano (testo normativo).
  * ------------------------------------------------------------------------------
  *  STORICO REVISIONI (dalla più recente)
+ *    Rev. 04 | 2026-10-24 20:49 | Sezione 3: menu «Account» al posto dei tre pulsanti; tolto «Chiudi applicazione»; «Torna alla scheda» nel report.
  *    Rev. 03 | 2026-10-24 15:43 | Sezione 3: aggiunti «Torna all'elenco» e le conferme di uscita (4 lingue).
  *    Rev. 02 | 2026-10-23 20:55 | Note della checklist dichiarate facoltative (anche per N.A.) nelle 4 lingue.
  *    Rev. 01 | 2026-10-23 20:49 | Creazione del file.
@@ -59,11 +60,10 @@ export const GUIDA: Record<Lingua, TestiGuida> = {
       {
         titolo: "3. Barra superiore",
         righe: [
-          "Sono sempre visibili l'email connessa, il selettore lingua (IT, EN, DE, ES), «Impostazioni generali ditta» e questa guida.",
-          "«Chiudi applicazione» esce dalla sessione e prova a chiudere la scheda; se il browser non lo permette, torni alla schermata di accesso.",
+          "Sono sempre visibili «Impostazioni generali ditta», questa guida, il selettore lingua (IT, EN, DE, ES) e il menu con la tua email: cliccandolo trovi «Esci» ed «Esci e cancella tutto».",
           "«Esci» chiude la sessione ma conserva licenza e PUK su questo dispositivo: al rientro basta un nuovo codice via email.",
           "«Esci e cancella tutto» rimuove da questo dispositivo email, licenza, PUK e consenso: usalo sui computer condivisi o per spostare il PUK. Non cancella le valutazioni né i dati ditta.",
-          "«Torna all'elenco» (visibile quando non sei sull'elenco) ti riporta alle valutazioni senza uscire dal programma. Prima di «Chiudi applicazione», «Esci» ed «Esci e cancella tutto» ti viene chiesta una conferma.",
+          "«Torna all'elenco» (visibile quando non sei sull'elenco) ti riporta alle valutazioni senza uscire dal programma. Nel report aperto dalla scheda, «Torna alla scheda» riporta alla scheda. Prima di «Esci» ed «Esci e cancella tutto» ti viene chiesta una conferma.",
         ],
       },
       {
@@ -149,11 +149,10 @@ export const GUIDA: Record<Lingua, TestiGuida> = {
       {
         titolo: "3. Top bar",
         righe: [
-          "Always visible: the connected email, the language selector (IT, EN, DE, ES), «Company general settings» and this guide.",
-          "«Close application» signs you out and tries to close the tab; if the browser does not allow it, you return to the sign-in screen.",
+          "Always visible: «Company general settings», this guide, the language selector (IT, EN, DE, ES) and the menu with your email: click it to find «Sign out» and «Sign out and clear everything».",
           "«Sign out» ends the session but keeps the licence and PUK on this device: when you come back, a new email code is enough.",
           "«Sign out and clear everything» removes the email, licence, PUK and consent from this device: use it on shared computers or to move the PUK. It does not delete assessments or company data.",
-          "«Back to the list» (shown when you are not on the list) takes you back to the assessments without leaving the program. Before «Close application», «Sign out» and «Sign out and clear everything» you are asked to confirm.",
+          "«Back to the list» (shown when you are not on the list) takes you back to the assessments without leaving the program. In a report opened from the form, «Back to the form» returns to the form. Before «Sign out» and «Sign out and clear everything» you are asked to confirm.",
         ],
       },
       {
@@ -239,11 +238,10 @@ export const GUIDA: Record<Lingua, TestiGuida> = {
       {
         titolo: "3. Obere Leiste",
         righe: [
-          "Immer sichtbar: die angemeldete E-Mail-Adresse, die Sprachauswahl (IT, EN, DE, ES), «Allgemeine Firmeneinstellungen» und dieses Handbuch.",
-          "«Anwendung schließen» meldet Sie ab und versucht, den Tab zu schließen; erlaubt der Browser das nicht, kehren Sie zur Anmeldeseite zurück.",
+          "Immer sichtbar: «Allgemeine Firmeneinstellungen», dieses Handbuch, die Sprachauswahl (IT, EN, DE, ES) und das Menü mit Ihrer E-Mail-Adresse: Dort finden Sie «Abmelden» und «Abmelden und alles löschen».",
           "«Abmelden» beendet die Sitzung, behält aber Lizenz und PUK auf diesem Gerät: Bei der Rückkehr genügt ein neuer E-Mail-Code.",
           "«Abmelden und alles löschen» entfernt E-Mail, Lizenz, PUK und Zustimmung von diesem Gerät: Nutzen Sie es auf gemeinsam genutzten Computern oder um den PUK zu übertragen. Bewertungen und Firmendaten werden nicht gelöscht.",
-          "«Zurück zur Liste» (sichtbar, wenn Sie nicht auf der Liste sind) bringt Sie zu den Bewertungen zurück, ohne das Programm zu verlassen. Vor «Anwendung schließen», «Abmelden» und «Abmelden und alles löschen» werden Sie um eine Bestätigung gebeten.",
+          "«Zurück zur Liste» (sichtbar, wenn Sie nicht auf der Liste sind) bringt Sie zu den Bewertungen zurück, ohne das Programm zu verlassen. In einem aus dem Bogen geöffneten Bericht führt «Zurück zum Bogen» zum Bogen zurück. Vor «Abmelden» und «Abmelden und alles löschen» werden Sie um eine Bestätigung gebeten.",
         ],
       },
       {
@@ -329,11 +327,10 @@ export const GUIDA: Record<Lingua, TestiGuida> = {
       {
         titolo: "3. Barra superior",
         righe: [
-          "Siempre visibles: el correo conectado, el selector de idioma (IT, EN, DE, ES), «Ajustes generales de la empresa» y esta guía.",
-          "«Cerrar aplicación» cierra la sesión e intenta cerrar la pestaña; si el navegador no lo permite, vuelves a la pantalla de acceso.",
+          "Siempre visibles: «Ajustes generales de la empresa», esta guía, el selector de idioma (IT, EN, DE, ES) y el menú con tu correo: ahí encuentras «Salir» y «Salir y borrar todo».",
           "«Salir» cierra la sesión pero conserva licencia y PUK en este dispositivo: al volver basta un nuevo código por correo.",
           "«Salir y borrar todo» elimina de este dispositivo correo, licencia, PUK y consentimiento: úsalo en ordenadores compartidos o para trasladar el PUK. No borra las evaluaciones ni los datos de la empresa.",
-          "«Volver a la lista» (visible cuando no estás en la lista) te lleva a las evaluaciones sin salir del programa. Antes de «Cerrar aplicación», «Salir» y «Salir y borrar todo» se te pide confirmación.",
+          "«Volver a la lista» (visible cuando no estás en la lista) te lleva a las evaluaciones sin salir del programa. En un informe abierto desde la ficha, «Volver a la ficha» te devuelve a la ficha. Antes de «Salir» y «Salir y borrar todo» se te pide confirmación.",
         ],
       },
       {
