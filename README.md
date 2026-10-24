@@ -55,3 +55,6 @@ cd <repository-name>
 npm i
 npm run dev
 ```
+
+
+Test sincronizzazione GitHub e Lovable: riga aggiunta il 2026-10-24 alle 16:26 (ora italiana).
