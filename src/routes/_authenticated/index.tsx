@@ -2,8 +2,8 @@
  *  TITOLO FILE      : index.tsx - Pagina principale dell'applicazione
  *  PERCORSO         : src/routes/_authenticated/index.tsx
  *  PROGETTO         : ppwr-reusability-hub (PPWR Reusability Hub)
- *  REVISIONE        : 04
- *  DATA E ORA REV.  : 2026-10-23 20:49 (ora italiana)
+ *  REVISIONE        : 05
+ *  DATA E ORA REV.  : 2026-10-24 15:43 (ora italiana)
  * ------------------------------------------------------------------------------
  *  DESCRIZIONE
  *    Pagina principale: elenco valutazioni, editor, impostazioni ditta, anteprima report,
@@ -12,6 +12,9 @@
  *    controllo prima della generazione, credito scalato solo a PDF riuscito.
  * ------------------------------------------------------------------------------
  *  STORICO REVISIONI (dalla più recente)
+ *    Rev. 05 | 2026-10-24 15:43 | Logo dell'app al posto dell'icona del riciclo; pulsante «Torna all'elenco» sempre visibile
+ *                                  fuori dall'elenco (con avviso se ci sono modifiche non salvate); il «Esci» di editor e
+ *                                  impostazioni diventa «Torna all'elenco» (non è più confondibile con il logout).
  *    Rev. 04 | 2026-10-23 20:49 | TopBar: aggiunto il pulsante «i» con la guida in-app in 4 lingue (GuidaApp).
  *    Rev. 03 | 2026-10-23 20:39 | Percorso aggiornato (pagina spostata sotto _authenticated). Quota export PDF:
  *                                  downloadPdf restituisce true/false; wrapper exportPdf (canExport prima,
@@ -27,7 +30,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { toast } from "sonner";
 import {
-  Building2, Copy, Eye, FileDown, FileJson, LogOut, Pencil, Plus, Printer, Save, Trash2, Upload, FileText, Recycle, ArrowLeft, TriangleAlert,
+  Building2, Copy, Eye, FileDown, FileJson, Pencil, Plus, Printer, Save, Trash2, Upload, FileText, ArrowLeft, TriangleAlert,
 } from "lucide-react";
 import {
   ALL6B, ART11, SISTEMA, TIPI_SISTEMA, rotationIndex, SETTORI, TIPOLOGIE, buildFileName, computeOutcome, exportJson, fmtDate, loadCompany, loadEvaluations,
@@ -36,6 +39,8 @@ import {
 import { Report } from "@/components/ppwr/Report";
 import { ControlliSessione } from "@/components/ControlliSessione";
 import { GuidaApp } from "@/components/GuidaApp";
+import logoApp from "@/assets/logo-ppwr-app.png";
+import { useTornaElenco } from "@/lib/conferme-testi";
 import { FN060_ExportCountBadge } from "@/moduli/accesso-controllato/esportazione/ExportCountBadge";
 import { useExportQuota } from "@/moduli/accesso-controllato/esportazione/useExportQuota";
 
@@ -139,6 +144,14 @@ function App() {
     if (!(await canExport())) return;
     printReport(ev);
   };
+  // Avviso se si lascia l'editor con modifiche non salvate (il flag arriva dall'Editor).
+  const dirtyRef = useRef(false);
+  const setDirtyFlag = useRef((d: boolean) => { dirtyRef.current = d; }).current;
+  const goList = () => {
+    if (view.kind === "edit" && dirtyRef.current && !confirm("Ci sono modifiche non salvate. Uscire comunque?")) return;
+    dirtyRef.current = false;
+    setView({ kind: "list" });
+  };
   const actions = useRef({ exportPdf, guardedPrint });
   actions.current = { exportPdf, guardedPrint };
 
@@ -164,7 +177,7 @@ function App() {
 
   return (
     <div className="min-h-screen bg-background">
-      <TopBar onHome={() => setView({ kind: "list" })} onSettings={() => setView({ kind: "settings" })} company={company} />
+      <TopBar onHome={goList} onBack={goList} inList={view.kind === "list"} onSettings={() => setView({ kind: "settings" })} company={company} />
       <main className="mx-auto max-w-6xl px-4 py-8">
         {view.kind === "list" && (
           <ListView
@@ -182,7 +195,8 @@ function App() {
             key={view.ev.id}
             initial={view.ev}
             onSave={(ev) => { const s = persist(ev); setView({ kind: "edit", ev: s }); toast.success("Lavoro salvato"); }}
-            onExit={() => setView({ kind: "list" })}
+            onExit={() => { dirtyRef.current = false; setView({ kind: "list" }); }}
+            onDirtyChange={setDirtyFlag}
             onPreview={(ev) => setView({ kind: "report", ev, from: "edit" })}
           />
         )}
@@ -209,12 +223,13 @@ function loadCompanySafe(): Company {
   return { ragioneSociale: "", piva: "", indirizzo: "", telefono: "", email: "", sito: "", logo: "", responsabile: "", ruolo: "Responsabile Tecnico" };
 }
 
-function TopBar({ onHome, onSettings, company }: { onHome: () => void; onSettings: () => void; company: Company }) {
+function TopBar({ onHome, onBack, inList, onSettings, company }: { onHome: () => void; onBack: () => void; inList: boolean; onSettings: () => void; company: Company }) {
+  const tornaElenco = useTornaElenco();
   return (
     <header className="no-print border-b border-border bg-card">
       <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-4 py-3">
         <button onClick={onHome} className="flex items-center gap-3 text-left">
-          <span className="grid h-9 w-9 place-items-center rounded-md bg-primary text-primary-foreground"><Recycle className="h-5 w-5" /></span>
+          <img src={logoApp} alt="PPWR Riutilizzo" className="h-10 w-10 object-contain" />
           <span>
             <span className="block text-base font-semibold leading-tight">PPWR Riutilizzo</span>
             <span className="block font-mono text-[11px] text-muted-foreground">Reg. UE 2025/40 · Art. 11 · All. VI-B</span>
@@ -222,6 +237,7 @@ function TopBar({ onHome, onSettings, company }: { onHome: () => void; onSetting
         </button>
         <div className="flex flex-wrap items-center justify-end gap-3">
           {company.ragioneSociale && <span className="hidden text-sm text-muted-foreground sm:block">{company.ragioneSociale}</span>}
+          {!inList && <button className={btnGhost} onClick={onBack}><ArrowLeft className="h-4 w-4" /> {tornaElenco}</button>}
           <button className={btnGhost} onClick={onSettings}><Building2 className="h-4 w-4" /> Impostazioni generali ditta</button>
           <GuidaApp />
           <ControlliSessione />
@@ -360,9 +376,11 @@ function Checklist({ title, subtitle, items, answers, onChange }: { title: strin
   );
 }
 
-function Editor({ initial, onSave, onExit, onPreview }: { initial: Evaluation; onSave: (e: Evaluation) => void; onExit: () => void; onPreview: (e: Evaluation) => void }) {
+function Editor({ initial, onSave, onExit, onPreview, onDirtyChange }: { initial: Evaluation; onSave: (e: Evaluation) => void; onExit: () => void; onPreview: (e: Evaluation) => void; onDirtyChange?: (d: boolean) => void }) {
   const [ev, setEv] = useState(initial);
   const [dirty, setDirty] = useState(false);
+  const tornaElenco = useTornaElenco();
+  useEffect(() => { onDirtyChange?.(dirty); }, [dirty, onDirtyChange]);
   const r = computeOutcome(ev);
   const upd = (fn: (e: Evaluation) => Evaluation) => { setEv(fn); setDirty(true); };
   const setI = (k: keyof Evaluation["imballo"], v: string) => upd((e) => ({ ...e, imballo: { ...e.imballo, [k]: v } }));
@@ -444,7 +462,7 @@ function Editor({ initial, onSave, onExit, onPreview }: { initial: Evaluation; o
           <button className={`${btnPrimary} justify-center`} onClick={() => { onSave(ev); setDirty(false); }}><Save className="h-4 w-4" /> Salva il lavoro fatto</button>
           <button className={`${btnGhost} justify-center`} onClick={() => onPreview(ev)}><Eye className="h-4 w-4" /> Anteprima Report</button>
           <button className={`${btnGhost} justify-center`} onClick={() => exportJson(ev)}><FileJson className="h-4 w-4" /> Esporta JSON</button>
-          <button className={`${btnGhost} justify-center`} onClick={exit}><LogOut className="h-4 w-4" /> Esci</button>
+          <button className={`${btnGhost} justify-center`} onClick={exit}><ArrowLeft className="h-4 w-4" /> {tornaElenco}</button>
           {dirty && <p className="text-center text-xs text-[var(--warn)]">Modifiche non salvate</p>}
         </div>
       </aside>
@@ -481,6 +499,7 @@ function ReportView({ ev, company, remaining, showLastExportWarning, onPrint, on
 }
 
 function Settings({ initial, onSave, onExit }: { initial: Company; onSave: (c: Company) => void; onExit: () => void }) {
+  const tornaElenco = useTornaElenco();
   const [c, setC] = useState(initial);
   const set = (k: keyof Company, v: string) => setC((x) => ({ ...x, [k]: v }));
   const onLogo = (f?: File) => {
@@ -512,7 +531,7 @@ function Settings({ initial, onSave, onExit }: { initial: Company; onSave: (c: C
         </div>
       </div>
       <div className="mt-4 flex justify-end gap-2">
-        <button className={btnGhost} onClick={onExit}><LogOut className="h-4 w-4" /> Esci</button>
+        <button className={btnGhost} onClick={onExit}><ArrowLeft className="h-4 w-4" /> {tornaElenco}</button>
         <button className={btnPrimary} onClick={() => onSave(c)}><Save className="h-4 w-4" /> Salva impostazioni</button>
       </div>
     </div>

@@ -2,8 +2,8 @@
  *  TITOLO FILE      : guida-testi.ts - Testi della guida in-app (IT, EN, DE, ES)
  *  PERCORSO         : src/lib/guida-testi.ts
  *  PROGETTO         : ppwr-reusability-hub (PPWR Reusability Hub)
- *  REVISIONE        : 02
- *  DATA E ORA REV.  : 2026-10-23 20:55 (ora italiana)
+ *  REVISIONE        : 03
+ *  DATA E ORA REV.  : 2026-10-24 15:43 (ora italiana)
  * ------------------------------------------------------------------------------
  *  DESCRIZIONE
  *    Testi della guida che si apre dal pulsante «i» nell'intestazione, nelle 4 lingue
@@ -13,6 +13,7 @@
  *    Nota: valutazioni, checklist, report e PDF restano in italiano (testo normativo).
  * ------------------------------------------------------------------------------
  *  STORICO REVISIONI (dalla più recente)
+ *    Rev. 03 | 2026-10-24 15:43 | Sezione 3: aggiunti «Torna all'elenco» e le conferme di uscita (4 lingue).
  *    Rev. 02 | 2026-10-23 20:55 | Note della checklist dichiarate facoltative (anche per N.A.) nelle 4 lingue.
  *    Rev. 01 | 2026-10-23 20:49 | Creazione del file.
  * ============================================================================== */
@@ -62,6 +63,7 @@ export const GUIDA: Record<Lingua, TestiGuida> = {
           "«Chiudi applicazione» esce dalla sessione e prova a chiudere la scheda; se il browser non lo permette, torni alla schermata di accesso.",
           "«Esci» chiude la sessione ma conserva licenza e PUK su questo dispositivo: al rientro basta un nuovo codice via email.",
           "«Esci e cancella tutto» rimuove da questo dispositivo email, licenza, PUK e consenso: usalo sui computer condivisi o per spostare il PUK. Non cancella le valutazioni né i dati ditta.",
+          "«Torna all'elenco» (visibile quando non sei sull'elenco) ti riporta alle valutazioni senza uscire dal programma. Prima di «Chiudi applicazione», «Esci» ed «Esci e cancella tutto» ti viene chiesta una conferma.",
         ],
       },
       {
@@ -151,6 +153,7 @@ export const GUIDA: Record<Lingua, TestiGuida> = {
           "«Close application» signs you out and tries to close the tab; if the browser does not allow it, you return to the sign-in screen.",
           "«Sign out» ends the session but keeps the licence and PUK on this device: when you come back, a new email code is enough.",
           "«Sign out and clear everything» removes the email, licence, PUK and consent from this device: use it on shared computers or to move the PUK. It does not delete assessments or company data.",
+          "«Back to the list» (shown when you are not on the list) takes you back to the assessments without leaving the program. Before «Close application», «Sign out» and «Sign out and clear everything» you are asked to confirm.",
         ],
       },
       {
@@ -240,6 +243,7 @@ export const GUIDA: Record<Lingua, TestiGuida> = {
           "«Anwendung schließen» meldet Sie ab und versucht, den Tab zu schließen; erlaubt der Browser das nicht, kehren Sie zur Anmeldeseite zurück.",
           "«Abmelden» beendet die Sitzung, behält aber Lizenz und PUK auf diesem Gerät: Bei der Rückkehr genügt ein neuer E-Mail-Code.",
           "«Abmelden und alles löschen» entfernt E-Mail, Lizenz, PUK und Zustimmung von diesem Gerät: Nutzen Sie es auf gemeinsam genutzten Computern oder um den PUK zu übertragen. Bewertungen und Firmendaten werden nicht gelöscht.",
+          "«Zurück zur Liste» (sichtbar, wenn Sie nicht auf der Liste sind) bringt Sie zu den Bewertungen zurück, ohne das Programm zu verlassen. Vor «Anwendung schließen», «Abmelden» und «Abmelden und alles löschen» werden Sie um eine Bestätigung gebeten.",
         ],
       },
       {
@@ -329,6 +333,7 @@ export const GUIDA: Record<Lingua, TestiGuida> = {
           "«Cerrar aplicación» cierra la sesión e intenta cerrar la pestaña; si el navegador no lo permite, vuelves a la pantalla de acceso.",
           "«Salir» cierra la sesión pero conserva licencia y PUK en este dispositivo: al volver basta un nuevo código por correo.",
           "«Salir y borrar todo» elimina de este dispositivo correo, licencia, PUK y consentimiento: úsalo en ordenadores compartidos o para trasladar el PUK. No borra las evaluaciones ni los datos de la empresa.",
+          "«Volver a la lista» (visible cuando no estás en la lista) te lleva a las evaluaciones sin salir del programa. Antes de «Cerrar aplicación», «Salir» y «Salir y borrar todo» se te pide confirmación.",
         ],
       },
       {

@@ -1,12 +1,15 @@
 // ======================================================================
 // Nome File: CorniceAccesso.tsx
 // Percorso: src/moduli/accesso-controllato/pagine/CorniceAccesso.tsx
-// Revisione: Rev. 1
-// Data/Ora: 2026-10-01 21:45
+// Revisione: Rev. 2
+// Data/Ora: 2026-10-24 15:43
+// Progetto: ppwr-reusability-hub (PPWR Reusability Hub)
+// Modifiche Rev. 2: il quadrato con l'iniziale dell'app è sostituito dal logo (src/assets/logo-ppwr-app.png).
 // ======================================================================
 
 // Cornice grafica comune alle schermate di accesso (logo, selettore lingua, scheda centrale).
 import { useEffect, type ReactNode } from "react";
+import logoApp from "@/assets/logo-ppwr-app.png";
 import { APP_NAME } from "../config";
 import { SelettoreLingua } from "../adattatore";
 
@@ -34,9 +37,7 @@ export function FN065_CorniceAccesso({
       <div className="w-full max-w-sm">
         <div className="mb-6 flex items-center justify-between gap-3">
           <div className="flex items-center gap-3">
-            <div className="grid size-9 place-items-center rounded-[9px] bg-foreground font-display text-[15px] font-bold text-background">
-              {APP_NAME.charAt(0)}
-            </div>
+            <img src={logoApp} alt={APP_NAME} className="size-10 object-contain" />
             <div className="font-display text-[15px] font-semibold">{APP_NAME}</div>
           </div>
           <SelettoreLingua />
